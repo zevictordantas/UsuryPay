@@ -1,4 +1,3 @@
-'use client';
 import { AppKitButton } from './AppKitButton';
 import Monopoly from '@/app/assets/Monopoly.jpg';
 import Image from 'next/image';

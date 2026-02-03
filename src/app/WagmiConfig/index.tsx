@@ -6,9 +6,7 @@ import { arcTestnet } from '@reown/appkit/networks';
  * This is mostly a copy of https://docs.reown.com/appkit/next/core/installation
  */
 
-// Get projectId from https://dashboard.reown.com
-// export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
-export const projectId = '123'; // @ToDo: Of course 123 is not a real project ID
+export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 
 if (!projectId) {
   throw new Error('Project ID is not defined');

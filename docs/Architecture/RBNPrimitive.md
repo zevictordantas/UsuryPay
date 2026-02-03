@@ -11,7 +11,8 @@
 ```solidity
 interface ICashflowNFT {
   struct Cashflow {
-    address borrower;              // DAO treasury or dividend source
+    address treasury;           // Source of funds (EmployerTreasury, DAO treasury, or Circle wallet)
+    address beneficiary;        // Original recipient of the cashflow (employee)
     address settlementManager;
     uint256 totalAmount;        // e.g. 2000 USDC
     uint256 startTime;
@@ -34,6 +35,14 @@ interface ICashflowNFT {
 - **NFT = asset**, not debt
 - Ownership = right to future payments
 - Works for payroll _and_ dividends
+
+### Field Definitions
+
+| Field | Description |
+|-------|-------------|
+| `treasury` | The address that holds and disburses funds (e.g., EmployerTreasury contract, Circle programmable wallet) |
+| `beneficiary` | The original earner of the cashflow (employee). Used for provenance even after NFT is sold |
+| `ownerOf(tokenId)` | Current NFT holder - receives settlement payouts (may differ from beneficiary after sale) |
 
 ---
 

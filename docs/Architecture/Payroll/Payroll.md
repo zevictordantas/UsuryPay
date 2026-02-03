@@ -12,6 +12,12 @@ Purpose: single-page brief that defines responsibilities, interfaces, flows, and
 - **Investor** — buys RBNs from marketplace. // Note: Usurer = UI name for Investor role
 - **Keeper / Relayer (off-chain)** — optional: triggers scheduled on-chain payments (does NOT hold funds).
 
+### Terminology Note
+
+- **Borrower** (the actor) = Employee who requests an advance
+- **Treasury** (the contract field) = Source of funds in CashflowNFT (`CashflowNFT.treasury`)
+- **Beneficiary** (the contract field) = Original employee in CashflowNFT (`CashflowNFT.beneficiary`)
+
 ---
 
 ## High-level architecture
@@ -82,6 +88,15 @@ function deposit(uint256 amount) external;
 function pay(uint256 payrollId, address receiver, uint256 amount) external;
 function availableBalance() external view returns (uint256);
 ```
+
+### Integration: EmployerTreasury <-> CashflowNFT
+
+When a payroll is created:
+- `PayrollManager.createPayroll()` registers the payroll
+- `CashflowNFT.mintCashflow()` is called with:
+  - `treasury` = EmployerTreasury address (or Circle wallet)
+  - `beneficiary` = employee address
+- The NFT owner initially equals beneficiary, but can be transferred to investors
 
 ---
 

@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-    color-scheme: only light; /* or 'dark' */
+  color-scheme: only light; /* or 'dark' */
 }
 
 @theme inline {

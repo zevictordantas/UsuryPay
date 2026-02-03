@@ -18,6 +18,7 @@ Purpose: single-page brief that defines responsibilities, interfaces, flows, and
 
 - **Contracts (on-chain)**:
   - `PayrollManager` — registry + query views.
+  - `EmployerTreasuryFactory` — deploys and registers per-employer `EmployerTreasury` instances.
   - `EmployerTreasury` — escrow per employer, holds USDC, executes `pay`.
   - `RBNToken` — NFT or ERC-20 representing credit claims.
   - `PayrollMarketplace` — buy/sell RBNs (transfer USDC → DAO and token → buyer).
@@ -34,7 +35,7 @@ Purpose: single-page brief that defines responsibilities, interfaces, flows, and
 - **Avoid indexers**: Expose `view` functions and paginated getters on `PayrollManager` so UI can fetch data directly from chain. Events are emitted for logs but not required for core functionality.
 - **No off-chain custody**: All funds remain in `EmployerTreasury` and DAO treasury on-chain.
 - **Repayment automation**: prefer **pull-based** model for MVP: borrower (or keeper with allowance) permits `Treasury` to pull repayments. Alternate: keeper calls `pay` to move funds from EmployerTreasury to RBN holder.
-- **Simplicity**: Optimize for little code, little infra. Reduce the amount of modules and features to get a workign MVP as quickly as possible
+- **Simplicity**: Optimize for little code, little infra. Reduce the amount of modules and features to get a working MVP as quickly as possible.
 
 ---
 
@@ -66,13 +67,37 @@ function listPayrollsByEmployee(address employee, uint256 cursor, uint256 limit)
 
 ---
 
+### EmployerTreasuryFactory (on-chain)
+
+**Responsibilities**
+
+- Deploy a new `EmployerTreasury` for each employer.
+- Register and map `employer => treasury`.
+- Provide simple discovery (getTreasury) for UI/keepers.
+- Emit `TreasuryCreated` event.
+
+**Essential function signatures**
+
+```solidity
+function createTreasury(address employer) external returns (address treasury);
+function getTreasury(address employer) external view returns (address treasury);
+event TreasuryCreated(address indexed employer, address treasury);
+```
+
+**Notes**
+
+- Factory allows lightweight per-employer isolation without central registry complexity.
+- PayrollManager or UI should use `getTreasury(employer)` to resolve the treasury address for pay/deposit calls.
+
+---
+
 ### EmployerTreasury (on-chain)
 
 **Responsibilities**
 
-- Hold employer USDC funds
+- Hold employer USDC funds (single-employer per contract)
 - `deposit()` by employer (approve + transferFrom)
-- `availableBalance()` view
+- `availableBalance()` view (returns contract balance)
 - `pay(payrollId, recipient, amount)` callable by `PayrollManager` or authorized keeper
 
 **Essential functions**
@@ -82,6 +107,12 @@ function deposit(uint256 amount) external;
 function pay(uint256 payrollId, address receiver, uint256 amount) external;
 function availableBalance() external view returns (uint256);
 ```
+
+**Notes**
+
+- Each treasury is single-employer; no employer parameter needed in functions
+- Access control for pay() to be added in future iteration
+- Ownership patterns to be added in future iteration
 
 ---
 
@@ -121,6 +152,8 @@ function buy(uint256 rbnId, uint256 price) external;
 
 - `PayrollManager.createPayroll(...)`
 - `PayrollManager.listPayrollsByEmployer(employer, cursor, limit)`
+- `EmployerTreasuryFactory.createTreasury(employer)`
+- `EmployerTreasuryFactory.getTreasury(employer)`
 - `EmployerTreasury.deposit(amount)`
 - `EmployerTreasury.pay(payrollId, receiver, amount)`
 - `RBNToken.mintToDao(metadataUri)`
@@ -133,7 +166,7 @@ function buy(uint256 rbnId, uint256 price) external;
 
 - **Try to avoid indexers (and the need for a backend)**: expose on-chain views. (Optionally paginated). This should be enough for minimal UI needs.
 - **Keep off-chain minimal**: keeper = transaction caller only; DAO backend minimal for minting RBNs.
-- **Avoid automatic payments at first** Automation is a nice to have. But for the demo, and local development manuall triggers are easier.
+- **Avoid automatic payments at first** Automation is a nice to have. But for the demo, and local development manual triggers are easier.
 
 ---
 
@@ -141,9 +174,11 @@ function buy(uint256 rbnId, uint256 price) external;
 
 ### Flow A — Employer creates payroll & funds treasury
 
-1. Employer wallet: `approve(EmployerTreasury, amount)`.
+1. Employer wallet: `approve(EmployerTreasury, amount)` (resolve treasury via `EmployerTreasuryFactory.getTreasury(employer)`; call `createTreasury` first if absent).
 2. Employer: `EmployerTreasury.deposit(amount)`.
 3. Employer: `PayrollManager.createPayroll(employee, amountPerPeriod, cadence, start, end)`.
+
+**Note:** UI should resolve treasury addresses via `factory.getTreasury(employer)` before deposit/pay operations.
 
 ### Flow B — Employee requests an advance (DAO-funded)
 
@@ -156,6 +191,7 @@ function buy(uint256 rbnId, uint256 price) external;
 **Option 1 (keeper-triggered):**
 
 1. Keeper reads `PayrollManager` for due payments (via `listPayrollsByEmployer`).
+
 2. Resolve recipient. We need to check if the employee has "active RBNs".
    - ⚠️ We need to define where and how to store this information. ⚠️
 
@@ -167,10 +203,12 @@ function buy(uint256 rbnId, uint256 price) external;
 **Option 2 (user-triggered, simplest):**
 
 1. Employer triggers `pay` via UI when paying cycle arrives.
-2. Same as Option 1: resolve recipien, call pay
+2. Same as Option 1: resolve recipient, call pay
 
 ### Flow D — Investor buys RBN
 
 1. Investor: `USDC.approve(PayrollMarketplace, price)`.
 2. Investor: `PayrollMarketplace.buy(rbnId, price)`.
 3. Contract transfers USDC to DAO and `RBNToken` to buyer.
+
+---

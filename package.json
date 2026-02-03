@@ -8,7 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "extract-deployments": "tsx scripts/extract-deployments.ts",
+    "wagmi:generate": "wagmi generate",
+    "predev": "pnpm run wagmi:generate",
+    "prebuild": "pnpm run wagmi:generate",
+    "deploy:local": "cd src/contracts && forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast",
+    "setup:dev": "pnpm run deploy:local && pnpm run wagmi:generate"
   },
   "dependencies": {
     "@reown/appkit": "^1.8.17",
@@ -25,12 +31,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@wagmi/cli": "^2.9.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

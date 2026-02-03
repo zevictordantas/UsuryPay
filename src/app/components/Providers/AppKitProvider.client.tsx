@@ -42,6 +42,7 @@ const modal = createAppKit({
     connectMethodsOrder: [/* "social", "email",*/ 'wallet'],
   },
   allowUnsupportedChain: false,
+  enableReconnect: true,
 });
 
 export function AppKitProvider({

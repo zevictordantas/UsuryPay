@@ -9,7 +9,7 @@ Purpose: single-page brief that defines responsibilities, interfaces, flows, and
 - **Employer** — deposits USDC, creates payrolls.
 - **Employee** — receives payroll, requests advance.
 - **DAO (Originator)** — funds advances, mints RBNs.
-- **Investor** — buys RBNs from marketplace.
+- **Investor** — buys RBNs from marketplace. // Note: Usurer = UI name for Investor role
 - **Keeper / Relayer (off-chain)** — optional: triggers scheduled on-chain payments (does NOT hold funds).
 
 ---

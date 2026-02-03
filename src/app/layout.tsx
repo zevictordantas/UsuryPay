@@ -32,7 +32,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
         >
           <Header />
-          <main className="flex flex-1">{children}</main>
+          <main className="flex flex-1 bg-zinc-100">{children}</main>
           <div className="w-full shrink-0 bg-black py-2 text-center text-white">
             Footer (ToDo)
           </div>

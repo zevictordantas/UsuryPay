@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Monopoly from '@/app/assets/Monopoly.jpg';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
+    <div className="flex flex-1 flex-col items-center justify-center text-center">
       <Image
         className="mx-auto"
         src={Monopoly}
@@ -12,7 +13,34 @@ export default function Home() {
         priority
       />
 
-      <h1 className="pb-60 text-6xl font-bold">Usury Pay</h1>
+      <h1 className="text-6xl font-bold">Usury Pay</h1>
+      <p className="mt-8">
+        Making usury accessible to everyone. <br />
+        Payroll dApp with credit lines and Open Usury
+      </p>
+      <div className="my-8 flex items-center gap-4">
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-700"
+          href="/#"
+        >
+          {' '}
+          I&apos;m a Usurer 🎩
+        </Link>
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-700"
+          href="/#"
+        >
+          {' '}
+          I&apos;m an Employer 💸
+        </Link>
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-700"
+          href="/#"
+        >
+          {' '}
+          I&apos;m an Employee 💳
+        </Link>
+      </div>
     </div>
   );
 }

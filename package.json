@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "contracts:build": "cd contracts && forge build",
+    "contracts:test": "cd contracts && forge test",
+    "contracts:deploy:local": "cd contracts && forge script script/Deploy.s.sol --rpc-url localhost --broadcast",
+    "contracts:deploy:arc-testnet": "cd contracts && forge script script/Deploy.s.sol --rpc-url $ARC_TESTNET_RPC --broadcast --verify",
+    "contracts:generate-types": "wagmi generate"
   },
   "dependencies": {
     "@reown/appkit": "^1.8.17",

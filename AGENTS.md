@@ -181,7 +181,9 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
 
 **Key Terminology:**
+
 - Use "EC" (Expected Cashflow), "ECVault", "ECToken" (NOT "RBN", "CashflowNFT", "SettlementManager")
 - This is "factoring" or "asset sale" (NOT "loans" or "credit lines")
+- Usurer is the UI display name for investors. Investors are people how buy EC tokens
 
 **Always reference docs when implementing features to ensure accuracy.**

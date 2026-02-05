@@ -15,7 +15,7 @@ export function PortfolioSummaryCard() {
       setIsLoading(true);
       try {
         // TODO: Implement Web3 call to get portfolio data
-        // const tokenIds = await contract.getOwnedECTokens(investorAddress);
+        // const tokenIds = await contract.getOwnedECTokens(usurerAddress);
         // const portfolioData = await Promise.all(
         //   tokenIds.map(id => contract.getECToken(id))
         // );

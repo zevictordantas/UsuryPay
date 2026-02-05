@@ -37,12 +37,17 @@ A secondary marketplace frontend for buying and selling EC tokens between users.
 
 ## Purpose
 
-A simple marketplace frontend for buying and selling EC tokens between users.
+A secondary marketplace frontend for buying and selling EC tokens between users.
 
 **Why it exists:**
 - Showcases the EC primitive's potential beyond the payroll use case
 - Demonstrates secondary market trading of tokenized cashflows
 - Keeps focus on the primitive rather than deep payroll implementation
+
+**UI Context:**
+- Accessed via the "Usurer" role in the frontend (route: `/usurer`)
+- "Usurer" is the UI term for marketplace participants who buy and trade EC tokens
+- Investors access the marketplace to purchase EC tokens at risk-adjusted discounts
 
 ## Overview
 

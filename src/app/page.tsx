@@ -15,6 +15,7 @@ export default function Home() {
           priority
         />
 
+<<<<<<< HEAD
         <div className="flex w-max flex-col rounded-2xl border border-zinc-200 bg-white p-4 shadow-lg transition-shadow hover:shadow-xl">
           {/* Dictionary Definition */}
           <div className="text-left">
@@ -144,6 +145,35 @@ export default function Home() {
             </Link>
           </div>
         </div>
+=======
+      <h1 className="text-6xl font-bold">Usury Pay</h1>
+      <p className="mt-8 text-zinc-600">
+        Making usury accessible to everyone. <br />
+        Payroll dApp with credit lines and Open Usury
+      </p>
+      <div className="my-8 flex items-center gap-4">
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-800"
+          href="/investor"
+        >
+          {' '}
+          I&apos;m an Investor 🎩
+        </Link>
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-800"
+          href="/employer"
+        >
+          {' '}
+          I&apos;m an Employer 💸
+        </Link>
+        <Link
+          className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-800"
+          href="/employee"
+        >
+          {' '}
+          I&apos;m an Employee 💳
+        </Link>
+>>>>>>> 045e610 (Phase 1: Create EC type definitions and update navigation)
       </div>
     </div>
   );

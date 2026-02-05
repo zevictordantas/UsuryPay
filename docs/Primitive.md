@@ -62,6 +62,7 @@ The primitive consists of two components:
 A **shortfall** occurs when `effectiveClaimable < claimable`.
 
 Defaults are checked:
+
 - When token holder attempts to claim
 - When vault is funded (if balance insufficient for current obligations)
 - Optionally, via keeper/permissionless checks
@@ -69,6 +70,7 @@ Defaults are checked:
 ### Default Registry
 
 Records default events with:
+
 - Timestamp
 - Shortfall amount
 - Optional amendment/settlement info (for future reconciliation)
@@ -211,12 +213,14 @@ where:
 ```
 
 **Why linear?**
+
 - Simple to understand and price
 - Matches most real-world payment schedules (salary, rent)
 - Gas-efficient calculation
 
 **Extensibility:**
 Implementations can override `calculateEntitled()` for:
+
 - Step functions (discrete monthly payments)
 - Irregular schedules (stored in `customParams`)
 - Conditional logic (milestones, KPIs)
@@ -253,6 +257,7 @@ effectiveClaimable_B = 200 × (150 / 300) = 100
 ```
 
 **Alternative approaches** (for future consideration):
+
 - First-come-first-served
 - Priority tiers (senior/junior tokens)
 - Waterfall distribution
@@ -273,18 +278,22 @@ effectiveClaimable_B = 200 × (150 / 300) = 100
 ## Security Considerations
 
 ### Reentrancy
+
 - Claims transfer tokens — use ReentrancyGuard or checks-effects-interactions
 - Especially critical if supporting ETH (not just ERC20)
 
 ### Front-Running
+
 - Pro-rata system creates race conditions on claims when vault underfunded
 - Future: Consider commitment schemes or priority queues
 
 ### Access Control
+
 - Minting authorization critical — prevents token inflation
 - Amendment rights — who can call amendDefault()?
 
 ### Integer Overflow
+
 - Use Solidity 0.8+ for automatic overflow checks
 - Careful with rate calculations (totalAmount / duration)
 
@@ -351,3 +360,7 @@ contract SalaryToken is IECToken {
 - ✅ No token splitting (ERC-721, not ERC-1155)
 - ✅ No off-chain dependencies
 - ✅ Minimal governance (minting auth only)
+
+# Cross Chain Implementation
+
+Details on how to implement cross chain can be found in [CrossChainPrimitive.md](./CrossChainPrimitive.md)

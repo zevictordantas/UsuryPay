@@ -21,10 +21,10 @@ export default function Home() {
       <div className="my-8 flex items-center gap-4">
         <Link
           className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-800"
-          href="/usurer"
+          href="/investor"
         >
           {' '}
-          I&apos;m a Usurer 🎩
+          I&apos;m an Investor 🎩
         </Link>
         <Link
           className="rounded-lg bg-black px-3 py-2 font-semibold text-white hover:bg-zinc-800"

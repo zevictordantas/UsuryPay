@@ -157,7 +157,6 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 
 **For any project context, architecture, requirements, or implementation details - read directly from the docs directory:**
 
-<<<<<<< HEAD
 - `docs/README.md` - Documentation index and reading guide
 - `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
 - `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
@@ -169,11 +168,17 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - Use "EC" (Expected Cashflow), "ECVault", "ECToken" (NOT "RBN", "CashflowNFT", "SettlementManager")
 - This is "factoring" or "asset sale" (NOT "loans" or "credit lines")
 - Usurer is the UI display name for investors. Investors are people how buy EC tokens
-=======
 - `docs/Description.md` - Project overview, economics, MVP specs
 - `docs/HackathonTracks.md` - Integration roadmap & sponsor strategy
 - `docs/DemoFlows.md` - User flows for payroll & dividend use cases
 - `docs/Architecture/` - Smart contract interfaces & integration specs
->>>>>>> f4ddb00 (AI setup)
+- `docs/README.md` - Documentation index and reading guide
+- `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
+- `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
+- `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
+
+**Key Terminology:**
+- Use "EC" (Expected Cashflow), "ECVault", "ECToken" (NOT "RBN", "CashflowNFT", "SettlementManager")
+- This is "factoring" or "asset sale" (NOT "loans" or "credit lines")
 
 **Always reference docs when implementing features to ensure accuracy.**

@@ -9,9 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 UsuryPay demonstrates the **Expected Cashflow (EC) primitive** - a DeFi primitive for tokenizing future payment streams with default risk. The payroll dApp enables employees to sell future salary for immediate liquidity (factoring, NOT loans).
 
 **Three-actor model:**
+
 - **Employers** - Fund vault, mint EC tokens for employees
 - **Employees** - Receive EC tokens, can sell them for immediate cash
-- **PayrollDApp** - Buys EC tokens at discount, manages risk assessment
+- **Usuriers** (UI term for investors/marketplace participants) - Buy EC tokens at discount, manage risk assessment
 
 ## Development Commands
 
@@ -34,6 +35,7 @@ forge fmt             # Format Solidity
 **Tech Stack:** Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4 + Wagmi/Viem
 
 **Directory Structure:**
+
 ```
 src/
 ├── app/                    # Next.js App Router
@@ -55,12 +57,15 @@ docs/                       # SOURCE OF TRUTH
 ## Key Terminology
 
 **Use these terms:**
+
 - **EC** (Expected Cashflow) - The primitive
 - **ECVault** - Escrow contract where payer deposits funds
 - **ECToken** - ERC-721 representing claim rights
 - **Factoring** - Selling future cashflows (what we do)
+- **Usurer** - UI term for investors/marketplace participants (documentation uses "investor")
 
 **DO NOT use these deprecated terms:**
+
 - ~~RBN~~ (Revenue-Backed Notes)
 - ~~CashflowNFT~~
 - ~~SettlementManager~~

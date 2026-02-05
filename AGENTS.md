@@ -8,7 +8,7 @@
 
 ## Project Overview
 
-Next.js payroll dApp with Revenue-Backed Notes (RBNs) - tradable tokens for undercollateralized future cashflows. React 19 + TypeScript + Tailwind + Web3 (Wagmi/Viem).
+Next.js payroll dApp demonstrating the Expected Cashflow (EC) primitive - a DeFi primitive for tokenizing future payment streams with default risk. The payroll use case enables employees to sell future salary for immediate liquidity (factoring, NOT loans). React 19 + TypeScript + Tailwind + Web3 (Wagmi/Viem).
 
 ## Development Commands
 
@@ -157,9 +157,13 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 
 **For any project context, architecture, requirements, or implementation details - read directly from the docs directory:**
 
-- `docs/Description.md` - Project overview, economics, MVP specs
-- `docs/HackathonTracks.md` - Integration roadmap & sponsor strategy
-- `docs/DemoFlows.md` - User flows for payroll & dividend use cases
-- `docs/Architecture/` - Smart contract interfaces & integration specs
+- `docs/README.md` - Documentation index and reading guide
+- `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
+- `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
+- `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
+
+**Key Terminology:**
+- Use "EC" (Expected Cashflow), "ECVault", "ECToken" (NOT "RBN", "CashflowNFT", "SettlementManager")
+- This is "factoring" or "asset sale" (NOT "loans" or "credit lines")
 
 **Always reference docs when implementing features to ensure accuracy.**

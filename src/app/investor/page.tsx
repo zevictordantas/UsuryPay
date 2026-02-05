@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { PortfolioSummaryCard } from './components/PortfolioSummaryCard';
-import { AvailableRBNCards } from './components/AvailableRBNCards';
+import { AvailableECTokenCards } from './components/AvailableECTokenCards';
 
-export default function UsurerPage() {
+export default function InvestorPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleRBNPurchased = () => {
+  const handleECTokenPurchased = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
@@ -15,17 +15,20 @@ export default function UsurerPage() {
     <div className="mx-auto w-full max-w-3xl py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          🎩 Usurer Dashboard
+          Investor Dashboard
         </h1>
         <p className="mt-2 text-gray-600">
-          Browse and invest in Revenue-Backed Notes
+          Browse and invest in Expected Cashflow (EC) Tokens
         </p>
       </div>
 
       <div className="grid gap-6">
         <PortfolioSummaryCard />
 
-        <AvailableRBNCards key={refreshKey} onPurchased={handleRBNPurchased} />
+        <AvailableECTokenCards
+          key={refreshKey}
+          onPurchased={handleECTokenPurchased}
+        />
       </div>
     </div>
   );

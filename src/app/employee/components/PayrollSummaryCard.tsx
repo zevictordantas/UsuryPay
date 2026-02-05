@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ECToken } from '@/app/types/ec-types';
 
 interface PayrollSummaryCardProps {
   totalEarnings?: number;
@@ -20,17 +21,16 @@ export function PayrollSummaryCard({
   nextPayment,
 }: PayrollSummaryCardProps) {
   const [payrolls, setPayrolls] = useState<Payroll[]>([]);
+  const [ownedTokens, setOwnedTokens] = useState<ECToken[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPayrolls = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
-        // TODO: Implement Web3 call to list payrolls by employee
+        // TODO: Implement Web3 call to list payrolls and owned EC tokens
         // const payrollIds = await contract.listPayrollsByEmployee(employeeAddress, 0, 10);
-        // const payrollData = await Promise.all(
-        //   payrollIds.map(id => contract.getPayroll(id))
-        // );
+        // const tokens = await contract.getOwnedTokens(employeeAddress);
 
         // Mock data for demo
         const mockPayrolls = [
@@ -50,18 +50,55 @@ export function PayrollSummaryCard({
           },
         ];
 
+        const mockTokens: ECToken[] = [
+          {
+            tokenId: '0x1a2b3c4d5e6f',
+            vaultAddress: '0xEmployerVault001',
+            totalAmount: 3000,
+            startTime: Date.now() / 1000 - 86400 * 7,
+            endTime: Date.now() / 1000 + 86400 * 23,
+            ratePerSecond: 3000 / (86400 * 30),
+            claimed: 700,
+            owner: '0xEmployee',
+            creditScore: 85,
+          },
+          {
+            tokenId: '0x7g8h9i0j1k2l',
+            vaultAddress: '0xEmployerVault001',
+            totalAmount: 2000,
+            startTime: Date.now() / 1000 - 86400 * 14,
+            endTime: Date.now() / 1000 + 86400 * 16,
+            ratePerSecond: 2000 / (86400 * 30),
+            claimed: 933,
+            owner: '0xEmployee',
+            creditScore: 85,
+          },
+        ];
+
         setTimeout(() => {
           setPayrolls(mockPayrolls);
+          setOwnedTokens(mockTokens);
           setIsLoading(false);
         }, 1000);
       } catch (error) {
-        console.error('Failed to fetch payrolls:', error);
+        console.error('Failed to fetch data:', error);
         setIsLoading(false);
       }
     };
 
-    fetchPayrolls();
+    fetchData();
   }, []);
+
+  const calculateClaimable = (token: ECToken) => {
+    const now = Date.now() / 1000;
+    const elapsed = Math.min(now - token.startTime, token.endTime - token.startTime);
+    const accrued = elapsed * token.ratePerSecond;
+    return Math.max(0, accrued - token.claimed);
+  };
+
+  const totalClaimableValue = ownedTokens.reduce((sum, token) => {
+    return sum + calculateClaimable(token);
+  }, 0);
 
   const totalMonthly = payrolls.reduce((sum, payroll) => {
     const monthlyAmount =
@@ -98,16 +135,20 @@ export function PayrollSummaryCard({
 
       <div className="grid gap-6 md:grid-cols-3">
         <div>
+          <p className="text-sm text-gray-600">Total Claimable Value</p>
+          <p className="text-2xl font-bold text-green-600">
+            {totalClaimableValue.toFixed(2)} USDC
+          </p>
+          <p className="text-xs text-gray-500">Across all owned EC tokens</p>
+        </div>
+
+        <div>
           <p className="text-sm text-gray-600">Active Payrolls</p>
           <p className="text-2xl font-bold text-gray-900">
             {payrolls.filter((p) => p.isActive).length}
           </p>
-        </div>
-
-        <div>
-          <p className="text-sm text-gray-600">Estimated Monthly</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {totalMonthly.toFixed(2)} USDC
+          <p className="text-xs text-gray-500">
+            Est. {totalMonthly.toFixed(0)} USDC/month
           </p>
         </div>
 

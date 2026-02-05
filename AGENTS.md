@@ -161,6 +161,7 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
 - `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
 - `docs/Marketplace.md` - EC Marketplace (demo component - implementation TBD)
+<<<<<<< HEAD
 - `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
 
 **Key Terminology:**
@@ -175,6 +176,8 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - `docs/README.md` - Documentation index and reading guide
 - `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
 - `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
+=======
+>>>>>>> 6bafede (added the marketplace to the docs)
 - `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
 
 **Key Terminology:**

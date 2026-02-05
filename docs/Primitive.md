@@ -18,28 +18,28 @@ Unlike yield-bearing assets with guaranteed returns (e.g., Pendle), EC tokens re
 The primitive consists of two components:
 
 1. **ECVault** — escrow contract where payer deposits funds
-2. **ECToken** — ERC-721 representing the right to claim from the vault
+2. **ECToken** — ERC-1155 representing the right to claim from the vault (For the MVP we wont allow fractionalization)
 
 ```
 ┌─────────────────┐
-│  EC Token (721) │──┐
+│ EC Token (1155) │──┐
 └─────────────────┘  │
                      │ references
 ┌─────────────────┐  │
-│  EC Token (721) │──┤
+│ EC Token (1155) │──┤
 └─────────────────┘  │
                      ├──> ┌──────────────┐
 ┌─────────────────┐  │    │   EC Vault   │
-│  EC Token (721) │──┤    │              │
+│ EC Token (1155) │──┤    │              │
 └─────────────────┘  │    │ ┌──────────┐ │
                      └───>│ │ Escrow   │ │
                           │ │ Balance  │ │
                           │ └──────────┘ │
                           │              │
                           │ ┌──────────┐ │
-                          │ │ Default  │ │
-                          │ │ Registry │ │
-                          │ └──────────┘ │
+                          │ │ Default  │ │           ┌─────────┐
+                          │ │ Registry │ │<--funds---│  Payer  │
+                          │ └──────────┘ │           └─────────┘
                           └──────────────┘
 ```
 
@@ -153,13 +153,13 @@ interface IECVault {
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 /**
  * @title IECToken
- * @notice Expected Cashflow token (ERC-721)
+ * @notice Expected Cashflow token (ERC-1155)
  */
-interface IECToken is IERC721 {
+interface IECToken is IERC1155 {
     struct PaymentSchedule {
         uint256 totalAmount;
         uint256 startTime;
@@ -357,7 +357,7 @@ contract SalaryToken is IECToken {
 - ✅ Linear accrual by default (no complex schedules in MVP)
 - ✅ Pro-rata distribution (no priority mechanisms)
 - ✅ No automatic distributions (user-triggered only)
-- ✅ No token splitting (ERC-721, not ERC-1155)
+- ✅ No token splitting (ERC-1155, not ERC-1155)
 - ✅ No off-chain dependencies
 - ✅ Minimal governance (minting auth only)
 

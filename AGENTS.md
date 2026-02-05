@@ -160,6 +160,7 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - `docs/README.md` - Documentation index and reading guide
 - `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
 - `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
+- `docs/Marketplace.md` - EC Marketplace (demo component - implementation TBD)
 - `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
 
 **Key Terminology:**

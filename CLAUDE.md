@@ -48,6 +48,7 @@ docs/                       # SOURCE OF TRUTH
 ├── README.md               # Documentation index
 ├── Primitive.md            # EC primitive specification (CORE)
 ├── UseCases/Payroll.md     # Payroll implementation
+├── Marketplace.md          # EC Marketplace (demo - details TBD)
 └── Integrations.md         # Optional integrations
 ```
 

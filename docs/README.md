@@ -34,7 +34,16 @@ Demonstration of EC primitive applied to payroll scenarios.
 - PayrollDApp - Buys EC tokens, manages risk assessment
 - No backend/indexer required (all view functions)
 
-### 3. [Integrations.md](./Integrations.md) - **OPTIONAL ENHANCEMENTS**
+### 3. EC Marketplace - **DEMO COMPONENT**
+
+A simple marketplace frontend for buying and selling EC tokens.
+
+- Purpose: Showcase the primitive's potential beyond payroll
+- Status: Implementation details not yet defined
+- Frontend-only component for demo purposes
+- Allows secondary trading of EC tokens between users
+
+### 4. [Integrations.md](./Integrations.md) - **OPTIONAL ENHANCEMENTS**
 
 External protocol integrations (NOT required for MVP):
 
@@ -50,6 +59,7 @@ docs/
 ├── Primitive.md           # EC primitive specification (CORE)
 ├── UseCases/
 │   └── Payroll.md         # Payroll dApp implementation (PRIMARY USE CASE)
+├── Marketplace.md         # EC Marketplace (demo component - details TBD)
 └── Integrations.md        # Optional external integrations
 ```
 
@@ -57,7 +67,8 @@ docs/
 
 1. **Primitive.md** - Understand the EC primitive first
 2. **UseCases/Payroll.md** - See how it's applied to payroll
-3. **Integrations.md** - Learn about optional enhancements
+3. **Marketplace.md** - EC token secondary market (demo purposes)
+4. **Integrations.md** - Learn about optional enhancements
 
 ## Key Principles
 

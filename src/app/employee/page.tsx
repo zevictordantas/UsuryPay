@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 import { PayrollSummaryCard } from './components/PayrollSummaryCard';
-import { AdvanceRequestCard } from './components/AdvanceRequestCard';
-import { AdvanceHistoryList } from './components/AdvanceHistoryList';
+import { ECTokenSaleCard } from './components/ECTokenSaleCard';
+import { ECTokenPortfolioList } from './components/ECTokenPortfolioList';
 
 export default function EmployeePage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleAdvanceRequested = () => {
+  const handleTokenSold = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
-  const handleAdvanceStatusChanged = () => {
+  const handleTokenStatusChanged = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
@@ -23,18 +23,18 @@ export default function EmployeePage() {
           💳 Employee Dashboard
         </h1>
         <p className="mt-2 text-gray-600">
-          Manage your payroll and advance requests
+          Manage your EC tokens and claim salary
         </p>
       </div>
 
       <div className="grid gap-6">
         <PayrollSummaryCard />
 
-        <AdvanceRequestCard onSuccess={handleAdvanceRequested} />
+        <ECTokenSaleCard onSuccess={handleTokenSold} />
 
-        <AdvanceHistoryList
+        <ECTokenPortfolioList
           key={refreshKey}
-          onStatusChanged={handleAdvanceStatusChanged}
+          onStatusChanged={handleTokenStatusChanged}
         />
       </div>
     </div>

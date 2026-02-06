@@ -8,6 +8,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+install everything using pnpm
+
+also run **cd contracts && forge install**
+
 First, run the development server:
 
 ```bash

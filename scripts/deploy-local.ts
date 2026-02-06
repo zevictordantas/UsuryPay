@@ -10,7 +10,7 @@ const NETWORK = {
 } as const;
 
 const DEPLOY_SCRIPT = 'Deploy.s.sol';
-const CONTRACTS = ['Marketplace', 'MockUSDC', 'MockECToken'] as const;
+const CONTRACTS = ['Marketplace', 'MockUSDC', 'MockECToken'] as const; // TODO: Rename RBNPrimitive to ECToken and add SettlementManager
 
 // Deploy
 execSync(

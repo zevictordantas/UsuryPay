@@ -22,7 +22,7 @@ export default defineConfig({
           31337: deployments.Marketplace as `0x${string}`,
         },
         MockUSDC: {
-          31337: deployments.MockUSDC as `0x${string}`,
+          31337: deployments.MockUSDC as `0x${string}`, // For any network other than 31337 USDC is not mocked, it should be real token
         },
         MockECToken: {
           31337: deployments.MockECToken as `0x${string}`,

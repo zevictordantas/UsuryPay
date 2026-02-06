@@ -25,6 +25,12 @@ contract Deploy is Script {
             vm.startBroadcast(deployerPrivateKey);
             usdc = address(new MockUSDC());
             treasuryAddress = msg.sender;
+
+            // Fund all anvil accounts with USDC (Play in fronted on local dev enviroment)
+            address[] memory wallets = vm.getWallets();
+            for (uint256 i = 0; i < wallets.length; i++) {
+                MockUSDC(usdc).mint(wallets[i], 1_000_000e6); // 1M USDC each
+            }
         } else {
             usdc = vm.envAddress("USDC_ADDRESS");
             treasuryAddress = vm.envAddress("TREASURY_ADDRESS");

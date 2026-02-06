@@ -1,27 +1,58 @@
 'use client';
 
 import { useState } from 'react';
-import { ECVault } from '@/app/types/ec-types';
+import { type Address, parseUnits, formatUnits } from 'viem';
+
+import { useChainId, useConnection, useWaitForTransactionReceipt } from 'wagmi';
+import {
+  useReadVaultBalance,
+  useReadRequiredEscrow,
+  useReadEmployerCreditScore,
+  useFundVault,
+} from '@/contracts/hooks/usePayrollVault';
+import { addresses } from '@/contracts/addresses';
+import { useWriteMockUsdcApprove, mockUsdcAddress } from '@/generated';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TreasuryCardProps {
-  vault?: ECVault;
+  vaultAddress: Address;
 }
 
-export function TreasuryCard({ vault }: TreasuryCardProps) {
+export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
   const [depositAmount, setDepositAmount] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [approveTxHash, setApproveTxHash] = useState<Address | undefined>();
 
-  // Mock vault data if not provided
-  const vaultData: ECVault = vault || {
-    address: '0x1234567890abcdef1234567890abcdef12345678',
-    balance: 25000,
-    requiredEscrow: 47000,
-    creditScore: 72,
-    defaultHistory: [],
-  };
+  const { address: employerAddress } = useConnection();
+  const chainId = useChainId();
+  const queryClient = useQueryClient();
+  const contractAddresses = addresses[chainId as keyof typeof addresses];
+  const usdcAddress = contractAddresses?.mockUSDC;
 
-  const isSolvent = vaultData.balance >= vaultData.requiredEscrow;
-  const shortfall = vaultData.requiredEscrow - vaultData.balance;
+  const { data: balance, queryKey: vaultBalanceQueryKey } =
+    useReadVaultBalance(vaultAddress);
+  const { data: requiredEscrow } = useReadRequiredEscrow(vaultAddress);
+  const { data: creditScore } = useReadEmployerCreditScore(vaultAddress);
+
+  const { fundVault, isPending: isFunding } = useFundVault();
+  // const { writeContractAsync: approveUsdc } = useWriteContract();
+  const writeMockUsdcApprove = useWriteMockUsdcApprove();
+
+  const {
+    isLoading: isWaitingForTxReceiptOfApproval,
+    refetch: refetchForTxReceiptOfApproval,
+  } = useWaitForTransactionReceipt({
+    hash: approveTxHash,
+  });
+
+  const vaultBalance = balance ? Number(formatUnits(balance, 6)) : 0;
+  const vaultRequiredEscrow = requiredEscrow
+    ? Number(formatUnits(requiredEscrow, 6))
+    : 0;
+  const vaultCreditScore = creditScore ? Number(creditScore) : 0;
+
+  const isSolvent = vaultBalance >= vaultRequiredEscrow;
+  const shortfall = vaultRequiredEscrow - vaultBalance;
 
   const getCreditScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
@@ -42,46 +73,64 @@ export function TreasuryCard({ vault }: TreasuryCardProps) {
   };
 
   const handleDeposit = async () => {
+    console.log('Treasury Card handleDepostit 1');
     if (!depositAmount || parseFloat(depositAmount) <= 0) return;
+    if (!usdcAddress || !employerAddress) return;
+    console.log('Treasury Card handleDepostit 2');
 
-    setIsLoading(true);
     try {
-      // TODO: Implement Web3 vault funding
-      // await contract.fundVault(vaultAddress, depositAmount);
-      console.log('Funding vault:', depositAmount, 'USDC');
+      const amountInWei = parseUnits(depositAmount, 6);
+
+      setIsApproving(true);
+      console.log('Approving USDC...');
+
+      if (!(chainId in mockUsdcAddress)) return;
+      await writeMockUsdcApprove.mutateAsync({
+        chainId: chainId as keyof typeof mockUsdcAddress,
+        args: [vaultAddress, amountInWei],
+      });
+
+      const result = await refetchForTxReceiptOfApproval();
+      console.log('result', result);
+      console.log('Funding vault...');
+      await fundVault(vaultAddress, amountInWei);
+
       setDepositAmount('');
+      console.log('Vault funded successfully!');
     } catch (error) {
       console.error('Vault funding failed:', error);
+      alert('Transaction failed. Check console for details.');
     } finally {
-      setIsLoading(false);
+      setIsApproving(false);
+      setApproveTxHash(undefined);
+      queryClient.invalidateQueries({ queryKey: vaultBalanceQueryKey });
     }
   };
+  const isLoading = isApproving || isWaitingForTxReceiptOfApproval || isFunding;
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">ECVault Treasury</h2>
+      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+        ECVault Treasury
+      </h2>
 
       <div className="mb-6 space-y-4">
         {/* Credit Score */}
-        <div className={`rounded-lg border p-4 ${getCreditScoreBgColor(vaultData.creditScore)}`}>
+        <div
+          className={`rounded-lg border p-4 ${getCreditScoreBgColor(vaultCreditScore)}`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700">Credit Score</p>
-              <p className={`text-3xl font-bold ${getCreditScoreColor(vaultData.creditScore)}`}>
-                {vaultData.creditScore}
+              <p
+                className={`text-3xl font-bold ${getCreditScoreColor(vaultCreditScore)}`}
+              >
+                {vaultCreditScore}
               </p>
               <p className="mt-1 text-xs text-gray-600">
-                {getCreditScoreLabel(vaultData.creditScore)}
+                {getCreditScoreLabel(vaultCreditScore)}
               </p>
             </div>
-            {vaultData.defaultHistory.length > 0 && (
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Defaults</p>
-                <p className="text-lg font-semibold text-red-600">
-                  {vaultData.defaultHistory.length}
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -90,26 +139,30 @@ export function TreasuryCard({ vault }: TreasuryCardProps) {
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">Vault Balance</p>
             <p className="text-lg font-bold text-gray-900">
-              {vaultData.balance.toFixed(2)} USDC
+              {vaultBalance.toFixed(2)} USDC
             </p>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">Required Escrow</p>
             <p className="text-lg font-semibold text-gray-900">
-              {vaultData.requiredEscrow.toFixed(2)} USDC
+              {vaultRequiredEscrow.toFixed(2)} USDC
             </p>
           </div>
           <div className="pt-2">
             {isSolvent ? (
               <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2">
                 <span className="text-green-600">✓</span>
-                <span className="text-sm font-medium text-green-800">Solvent</span>
+                <span className="text-sm font-medium text-green-800">
+                  Solvent
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-2 rounded-md bg-red-50 px-3 py-2">
                 <span className="text-red-600">⚠</span>
                 <div className="flex-1">
-                  <span className="text-sm font-medium text-red-800">Underfunded</span>
+                  <span className="text-sm font-medium text-red-800">
+                    Underfunded
+                  </span>
                   <p className="text-xs text-red-600">
                     Need {shortfall.toFixed(2)} USDC more
                   </p>

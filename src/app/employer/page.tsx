@@ -2,17 +2,26 @@
 
 import { useState } from 'react';
 import { TreasuryCard } from './components/TreasuryCard';
-import { CreatePayrollForm } from './components/CreatePayrollForm';
-import { PayrollList } from './components/PayrollList';
+import { MintECTokenForm } from './components/MintECTokenForm';
+import { MintedECTokensList } from './components/MintedECTokensList';
 
 export default function EmployerPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handlePayrollCreated = () => {
+  // Mock vault data - will be replaced with Web3 calls
+  const mockVault = {
+    address: '0x1234567890abcdef1234567890abcdef12345678',
+    balance: 25000,
+    requiredEscrow: 47000,
+    creditScore: 72,
+    defaultHistory: [],
+  };
+
+  const handleECTokenMinted = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
-  const handlePaymentMade = () => {
+  const handleVaultFunded = () => {
     setRefreshKey((prev) => prev + 1);
   };
 
@@ -20,17 +29,23 @@ export default function EmployerPage() {
     <div className="mx-auto w-full max-w-3xl py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          💸 Employer Dashboard
+          Employer Dashboard
         </h1>
-        <p className="mt-2 text-gray-600">Manage your payroll and treasury</p>
+        <p className="mt-2 text-gray-600">
+          Manage EC tokens and vault treasury
+        </p>
       </div>
 
       <div className="grid gap-6">
-        <TreasuryCard />
+        <TreasuryCard vault={mockVault} />
 
-        <CreatePayrollForm onSuccess={handlePayrollCreated} />
+        <MintECTokenForm
+          onSuccess={handleECTokenMinted}
+          vaultBalance={mockVault.balance}
+          requiredEscrow={mockVault.requiredEscrow}
+        />
 
-        <PayrollList key={refreshKey} onPaymentMade={handlePaymentMade} />
+        <MintedECTokensList key={refreshKey} onVaultFunded={handleVaultFunded} />
       </div>
     </div>
   );

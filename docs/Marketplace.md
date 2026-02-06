@@ -16,7 +16,12 @@
 
 ---
 
-# Simple Flow definition:
+**UI Context:**
+- Accessed via the "Usurer" role in the frontend (route: `/usurer`)
+- "Usurer" is the UI term for marketplace participants who buy and trade EC tokens
+- Investors access the marketplace to purchase EC tokens at risk-adjusted discounts
+
+## Overview
 
 - List EC tokens for sale (any EC token, not just payroll)
 - Browse available EC tokens

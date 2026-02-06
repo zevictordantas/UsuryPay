@@ -16,12 +16,30 @@
 
 ---
 
+# Simple Flow definition:
+
+**Status:** Demo component - implementation details not yet defined
+
+## Purpose
+
+A secondary marketplace frontend for buying and selling EC tokens between users.
+
+**Why it exists:**
+- Showcases the EC primitive's potential beyond the payroll use case
+- Demonstrates secondary market trading of tokenized cashflows
+- Keeps focus on the primitive rather than deep payroll implementation
+
+---
+
 **UI Context:**
 - Accessed via the "Usurer" role in the frontend (route: `/usurer`)
 - "Usurer" is the UI term for marketplace participants who buy and trade EC tokens
 - Investors access the marketplace to purchase EC tokens at risk-adjusted discounts
 
 ## Overview
+
+
+The marketplace allows users to:
 
 - List EC tokens for sale (any EC token, not just payroll)
 - Browse available EC tokens
@@ -199,6 +217,49 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 4. Test flows with real wallets on testnet and smoke test events
 
 ---
+## Key Points
+
+- **Frontend-only component** - Simple UI for demo purposes
+- **Not payroll-specific** - Works with any EC token implementation
+- **Implementation details TBD** - Pricing, matching, settlement mechanics to be defined later
+- **Optional** - Core primitive and payroll use case are sufficient for MVP
+
+## Architecture (Conceptual)
+
+```
+User A (EC Token Owner)
+    │
+    └─> Lists EC token for sale
+            │
+            ▼
+    ┌───────────────────┐
+    │  EC Marketplace   │  (Frontend)
+    │  • Browse tokens  │
+    │  • View details   │
+    │  • Make offers    │
+    └─────────┬─────────┘
+              │
+              ▼
+    User B purchases token
+            │
+            └─> EC token ownership transfers
+```
+
+## Implementation Notes
+
+<!-- Implementation details are not currently defined -->
+
+**To be determined:**
+- On-chain orderbook vs. off-chain matching
+- Pricing mechanism (fixed price, auction, offers)
+- Settlement flow (atomic swap vs. escrow)
+- Fee structure (if any)
+
+**Frontend considerations:**
+- Display token entitlement schedules
+- Show vault credit scores / default history
+- Filter by token type, amount, duration
+- Risk indicators for buyers
 
 ## Related Documentation
 
@@ -212,3 +273,5 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 This document defines a compact, single-chain USDC-priced marketplace for whole EC tokens. Keep the implementation minimal and robust: escrow the token in contract custody, accept USDC payments via `transferFrom`, and ensure atomic buy semantics and simple, auditable invariants. The final product is backend-free, demonstrative, and focused on proving the EC primitive behaves as a tradable asset.
 
 **Important to remember:** This marketplace is primarily for demonstration purposes. The core value is the EC primitive itself, which enables any application to create and trade tokenized cashflows.
+**Note:** This marketplace is primarily for demonstration purposes. The core value is the EC primitive itself, which enables any application to create and trade tokenized cashflows.
+

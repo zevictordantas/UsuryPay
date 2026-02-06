@@ -5,7 +5,9 @@ import { MarketplaceFilters } from '../page';
 import { ECTokenCard } from './ECTokenCard';
 
 export interface MarketplaceToken {
+  listingId: string;
   tokenId: string;
+  tokenAddress: string;
   vaultAddress: string;
   seller: string;
   sellerName: string;
@@ -27,7 +29,9 @@ export interface MarketplaceToken {
 // Mock data for demo - diverse EC tokens from various sources
 const mockMarketplaceTokens: MarketplaceToken[] = [
   {
+    listingId: '1',
     tokenId: '0x1a2b3c',
+    tokenAddress: '0xECToken001',
     vaultAddress: '0xTechCorp001',
     seller: '0xEmployee123',
     sellerName: 'Alice',
@@ -46,7 +50,9 @@ const mockMarketplaceTokens: MarketplaceToken[] = [
     listedAt: Date.now() - 86400000 * 2,
   },
   {
+    listingId: '2',
     tokenId: '0x4d5e6f',
+    tokenAddress: '0xECToken002',
     vaultAddress: '0xStartupXYZ002',
     seller: '0xEmployee456',
     sellerName: 'Bob',
@@ -65,7 +71,9 @@ const mockMarketplaceTokens: MarketplaceToken[] = [
     listedAt: Date.now() - 86400000,
   },
   {
+    listingId: '3',
     tokenId: '0x7g8h9i',
+    tokenAddress: '0xECToken003',
     vaultAddress: '0xRetailShop003',
     seller: '0xLandlord789',
     sellerName: 'Property LLC',
@@ -84,7 +92,9 @@ const mockMarketplaceTokens: MarketplaceToken[] = [
     listedAt: Date.now() - 86400000 * 5,
   },
   {
+    listingId: '4',
     tokenId: '0xj0k1l2',
+    tokenAddress: '0xECToken004',
     vaultAddress: '0xSaaSCompany004',
     seller: '0xFounder001',
     sellerName: 'SaaS Founder',
@@ -103,7 +113,9 @@ const mockMarketplaceTokens: MarketplaceToken[] = [
     listedAt: Date.now() - 86400000 * 3,
   },
   {
+    listingId: '5',
     tokenId: '0xm3n4o5',
+    tokenAddress: '0xECToken005',
     vaultAddress: '0xFinServ005',
     seller: '0xEmployee999',
     sellerName: 'Carol',
@@ -122,7 +134,9 @@ const mockMarketplaceTokens: MarketplaceToken[] = [
     listedAt: Date.now() - 86400000 * 1,
   },
   {
+    listingId: '6',
     tokenId: '0xp6q7r8',
+    tokenAddress: '0xECToken006',
     vaultAddress: '0xDividendCorp006',
     seller: '0xInvestor123',
     sellerName: 'Investor Dave',
@@ -154,15 +168,42 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
     const fetchMarketplaceTokens = async () => {
       setIsLoading(true);
       try {
-        // TODO: Implement Web3 call to fetch marketplace listings
-        // const listings = await marketplaceContract.getActiveListings();
+        // TODO: Web3 Integration - Replace with actual contract calls
+        // const listings = await marketplaceContract.read.getAllListings();
+        //
         // const tokenData = await Promise.all(
-        //   listings.map(async (listing) => {
-        //     const tokenInfo = await ecTokenContract.getTokenInfo(listing.tokenId);
-        //     const vaultInfo = await ecVaultContract.getVaultInfo(tokenInfo.vaultAddress);
-        //     return { ...listing, ...tokenInfo, ...vaultInfo };
-        //   })
+        //   listings
+        //     .filter(listing => listing.active)
+        //     .map(async (listing) => {
+        //       // Fetch EC token details
+        //       const tokenContract = getContract({
+        //         address: listing.tokenAddress,
+        //         abi: ECTokenABI,
+        //       });
+        //       const tokenInfo = await tokenContract.read.getTokenInfo([listing.tokenId]);
+        //
+        //       // Fetch vault info for risk assessment
+        //       const vaultContract = getContract({
+        //         address: tokenInfo.vaultAddress,
+        //         abi: ECVaultABI,
+        //       });
+        //       const vaultInfo = await vaultContract.read.getVaultInfo();
+        //
+        //       return {
+        //         listingId: listing.id,
+        //         tokenId: listing.tokenId.toString(),
+        //         tokenAddress: listing.tokenAddress,
+        //         tokenType: listing.tokenType, // ERC721 or ERC1155
+        //         seller: listing.seller,
+        //         askPrice: Number(listing.price), // USDC with 6 decimals
+        //         vaultAddress: tokenInfo.vaultAddress,
+        //         futureValue: Number(tokenInfo.totalEntitlement),
+        //         claimed: Number(tokenInfo.claimed),
+        //         // Calculate discount and other metrics
+        //       };
+        //     })
         // );
+        // setTokens(tokenData);
 
         setTimeout(() => {
           setTokens(mockMarketplaceTokens);

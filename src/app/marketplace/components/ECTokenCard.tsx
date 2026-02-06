@@ -14,18 +14,37 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
   const handlePurchase = async () => {
     setIsPurchasing(true);
     try {
-      // TODO: Implement Web3 purchase
-      // 1. Approve USDC/payment token for askPrice amount
-      // await usdcContract.approve(marketplaceAddress, token.askPrice);
-      // 2. Execute purchase on marketplace contract
-      // await marketplaceContract.buyToken(token.tokenId);
-      // 3. Token transfers to buyer, USDC transfers to seller
-      console.log('Purchasing token:', token.tokenId);
+      // TODO: Web3 Integration - Replace with actual contract calls
+      // Step 1: Check USDC balance
+      // const usdcBalance = await usdcContract.read.balanceOf([userAddress]);
+      // if (usdcBalance < token.askPrice) {
+      //   alert('Insufficient USDC balance');
+      //   return;
+      // }
 
-      // Mock delay
+      // Step 2: Check USDC allowance
+      // const allowance = await usdcContract.read.allowance([userAddress, marketplaceAddress]);
+      // if (allowance < token.askPrice) {
+      //   console.log('Approving USDC...');
+      //   const approveTx = await usdcContract.write.approve([marketplaceAddress, token.askPrice]);
+      //   await approveTx.wait();
+      // }
+
+      // Step 3: Execute purchase
+      // console.log('Purchasing token...');
+      // const buyTx = await marketplaceContract.write.buy([token.listingId]);
+      // await buyTx.wait();
+
+      // Step 4: Listen for Bought event
+      // marketplace.on('Bought', (listingId, buyer, seller, price) => {
+      //   console.log('Token purchased successfully');
+      // });
+
+      console.log('Purchasing listing:', token.listingId, 'Token:', token.tokenId);
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       alert('Purchase successful! Token transferred to your wallet.');
+      window.location.reload();
     } catch (error) {
       console.error('Purchase failed:', error);
       alert('Purchase failed. Please try again.');

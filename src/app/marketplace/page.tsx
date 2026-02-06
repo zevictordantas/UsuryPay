@@ -21,11 +21,19 @@ export default function MarketplacePage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">EC Token Marketplace</h1>
-        <p className="mt-2 text-gray-600">
-          Browse and trade Expected Cashflow (EC) tokens from various sources
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">EC Token Marketplace</h1>
+          <p className="mt-2 text-gray-600">
+            Browse and trade Expected Cashflow (EC) tokens from various sources
+          </p>
+        </div>
+        <a
+          href="/marketplace/list"
+          className="rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+        >
+          List Token
+        </a>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">

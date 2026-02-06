@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
@@ -64,24 +64,21 @@ contract MockECToken is ERC1155 {
         return entitled - claimed;
     }
 
-    function getEffectiveClaimable(uint256 tokenId) external view returns (uint256 effectiveClaimable, uint256 shortfall) {
+    function getEffectiveClaimable(uint256 tokenId)
+        external
+        view
+        returns (uint256 effectiveClaimable, uint256 shortfall)
+    {
         effectiveClaimable = this.getClaimable(tokenId);
         shortfall = 0;
     }
 
-    function mint(
-        address recipient,
-        uint256 vaultId,
-        PaymentSchedule calldata schedule,
-        bytes calldata metadata
-    ) external returns (uint256 tokenId) {
+    function mint(address recipient, uint256 vaultId, PaymentSchedule calldata schedule, bytes calldata metadata)
+        external
+        returns (uint256 tokenId)
+    {
         tokenId = ++_nextTokenId;
-        _tokenInfo[tokenId] = TokenInfo({
-            vaultId: vaultId,
-            schedule: schedule,
-            claimed: 0,
-            metadata: metadata
-        });
+        _tokenInfo[tokenId] = TokenInfo({vaultId: vaultId, schedule: schedule, claimed: 0, metadata: metadata});
         _mint(recipient, tokenId, 1, "");
         emit TokenMinted(tokenId, vaultId, recipient);
     }

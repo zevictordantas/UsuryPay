@@ -10,8 +10,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "contracts:build": "cd contracts && forge build",
-    "contracts:test": "cd contracts && forge test",
     "lint": "eslint",
     "format": "prettier --write .",
     "contracts:build": "cd contracts && forge build",

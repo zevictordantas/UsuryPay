@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "anvil": "anvil",
+    "deploy:local": "node --env-file=contracts/.env --import tsx scripts/deploy-local.ts",
+    "wagmi:generate": "wagmi generate",
+    "wagmi:watch": "wagmi generate --watch",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "contracts:build": "cd contracts && forge build",
+    "contracts:test": "cd contracts && forge test",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -25,12 +31,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@wagmi/cli": "^2.9.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

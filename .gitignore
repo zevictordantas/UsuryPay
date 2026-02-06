@@ -46,3 +46,7 @@ contracts/lib/
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+
+# wagmi generated
+src/generated.ts
+deployments.json

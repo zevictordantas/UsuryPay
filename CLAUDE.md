@@ -18,6 +18,9 @@ UsuryPay demonstrates the **Expected Cashflow (EC) primitive** - a DeFi primitiv
 
 ```bash
 pnpm install          # Install dependencies
+pnpm anvil            # Start local Anvil testnet
+pnpm deploy:local     # Deploy contracts to Anvil, write deployments.json
+pnpm wagmi:generate   # Generate typed React hooks from contract ABIs
 pnpm dev              # Dev server (localhost:3000)
 pnpm build            # Production build
 pnpm lint             # Run ESLint
@@ -25,8 +28,8 @@ pnpm format           # Format with Prettier
 pnpm format:check     # Check formatting
 
 # Smart contracts (Foundry)
-forge build           # Build contracts
-forge test            # Run contract tests
+pnpm contracts:build  # Build contracts
+pnpm contracts:test   # Run contract tests
 forge fmt             # Format Solidity
 ```
 

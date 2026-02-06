@@ -1,17 +1,12 @@
 # EC Marketplace
 
-<<<<<<< HEAD
 **Purpose:** Minimal single-chain marketplace to demo trading of EC tokens.
 **Currency:** USDC (hard-coded at deployment).
 **Scope:** Single EVM chain, on-chain escrow, fixed-price whole-token sales only (ERC-721 and ERC-1155). No orderbook, no fractionalization, no fees, no off-chain matching.
 
 ---
 
-<<<<<<< HEAD
-A secondary marketplace frontend for buying and selling EC tokens between users.
-=======
 ## High-level design
->>>>>>> 2f14099 (Wrote marketplace documentation)
 
 - Sellers **escrow** EC tokens in a single `Marketplace` contract.
 - Listings are stored on-chain (small metadata record).
@@ -19,20 +14,10 @@ A secondary marketplace frontend for buying and selling EC tokens between users.
 - Frontend provides two views: `List EC` and `Browse & Buy`.
 - No backend required.
 
-<<<<<<< HEAD
-**UI Context:**
-- Accessed via the "Usurer" role in the frontend (route: `/usurer`)
-- "Usurer" is the UI term for marketplace participants who buy and trade EC tokens
-- Investors access the marketplace to purchase EC tokens at risk-adjusted discounts
-
-## Overview
-=======
 ---
 
 # Simple Flow definition:
->>>>>>> 2f14099 (Wrote marketplace documentation)
 
-=======
 **Status:** Demo component - implementation details not yet defined
 
 ## Purpose
@@ -44,6 +29,8 @@ A secondary marketplace frontend for buying and selling EC tokens between users.
 - Demonstrates secondary market trading of tokenized cashflows
 - Keeps focus on the primitive rather than deep payroll implementation
 
+---
+
 **UI Context:**
 - Accessed via the "Usurer" role in the frontend (route: `/usurer`)
 - "Usurer" is the UI term for marketplace participants who buy and trade EC tokens
@@ -51,14 +38,14 @@ A secondary marketplace frontend for buying and selling EC tokens between users.
 
 ## Overview
 
+
 The marketplace allows users to:
->>>>>>> 6bafede (added the marketplace to the docs)
+
 - List EC tokens for sale (any EC token, not just payroll)
 - Browse available EC tokens
 - Purchase EC tokens from other users
 - View token details (vault info, entitlement schedule, default history)
 
-<<<<<<< HEAD
 ---
 
 ## On-chain: Contract responsibilities
@@ -230,7 +217,6 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 4. Test flows with real wallets on testnet and smoke test events
 
 ---
-=======
 ## Key Points
 
 - **Frontend-only component** - Simple UI for demo purposes
@@ -274,7 +260,6 @@ User A (EC Token Owner)
 - Show vault credit scores / default history
 - Filter by token type, amount, duration
 - Risk indicators for buyers
->>>>>>> 6bafede (added the marketplace to the docs)
 
 ## Related Documentation
 
@@ -283,12 +268,10 @@ User A (EC Token Owner)
 
 ---
 
-<<<<<<< HEAD
 ## Summary
 
 This document defines a compact, single-chain USDC-priced marketplace for whole EC tokens. Keep the implementation minimal and robust: escrow the token in contract custody, accept USDC payments via `transferFrom`, and ensure atomic buy semantics and simple, auditable invariants. The final product is backend-free, demonstrative, and focused on proving the EC primitive behaves as a tradable asset.
 
 **Important to remember:** This marketplace is primarily for demonstration purposes. The core value is the EC primitive itself, which enables any application to create and trade tokenized cashflows.
-=======
 **Note:** This marketplace is primarily for demonstration purposes. The core value is the EC primitive itself, which enables any application to create and trade tokenized cashflows.
->>>>>>> 6bafede (added the marketplace to the docs)
+

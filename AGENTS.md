@@ -161,23 +161,6 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
 - `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
 - `docs/Marketplace.md` - EC Marketplace (demo component - implementation TBD)
-<<<<<<< HEAD
-- `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
-
-**Key Terminology:**
-
-- Use "EC" (Expected Cashflow), "ECVault", "ECToken" (NOT "RBN", "CashflowNFT", "SettlementManager")
-- This is "factoring" or "asset sale" (NOT "loans" or "credit lines")
-- Usurer is the UI display name for investors. Investors are people how buy EC tokens
-- `docs/Description.md` - Project overview, economics, MVP specs
-- `docs/HackathonTracks.md` - Integration roadmap & sponsor strategy
-- `docs/DemoFlows.md` - User flows for payroll & dividend use cases
-- `docs/Architecture/` - Smart contract interfaces & integration specs
-- `docs/README.md` - Documentation index and reading guide
-- `docs/Primitive.md` - **EC primitive specification (CORE)** - Read this first
-- `docs/UseCases/Payroll.md` - Payroll dApp implementation (primary use case)
-=======
->>>>>>> 6bafede (added the marketplace to the docs)
 - `docs/Integrations.md` - Optional external integrations (ENS, Arc, Yellow)
 
 **Key Terminology:**

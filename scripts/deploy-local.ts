@@ -10,7 +10,7 @@ const NETWORK = {
 } as const;
 
 const DEPLOY_SCRIPT = 'Deploy.s.sol';
-const CONTRACTS = ['Marketplace', 'MockUSDC'] as const;
+const CONTRACTS = ['Marketplace', 'MockUSDC', 'MockECToken'] as const;
 
 // Deploy
 execSync(
@@ -30,21 +30,31 @@ async function getLatestBroadcastedTransactions(
   return runLatestJson.default.transactions;
 }
 
-const transactions = await getLatestBroadcastedTransactions(
-  DEPLOY_SCRIPT,
-  NETWORK.chainId
-);
+async function main() {
+  const transactions = await getLatestBroadcastedTransactions(
+    DEPLOY_SCRIPT,
+    NETWORK.chainId
+  );
 
-const deployments = Object.fromEntries(
-  CONTRACTS.map((name) => {
-    const tx = transactions.find(
-      (t: { transactionType: string; contractName: string }) =>
-        t.transactionType === 'CREATE' && t.contractName === name
-    );
-    if (!tx) throw new Error(`${name} not found in broadcast`);
-    return [name, tx.contractAddress];
-  })
-);
+  const deployments = Object.fromEntries(
+    CONTRACTS.map((name) => {
+      const tx = transactions.find(
+        (t: { transactionType: string; contractName: string }) =>
+          t.transactionType === 'CREATE' && t.contractName === name
+      );
+      if (!tx) throw new Error(`${name} not found in broadcast`);
+      return [name, tx.contractAddress];
+    })
+  );
 
-writeFileSync('deployments.json', JSON.stringify(deployments, null, 2) + '\n');
-console.log('deployments.json:', deployments);
+  writeFileSync(
+    'deployments.json',
+    JSON.stringify(deployments, null, 2) + '\n'
+  );
+  console.log('deployments.json:', deployments);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

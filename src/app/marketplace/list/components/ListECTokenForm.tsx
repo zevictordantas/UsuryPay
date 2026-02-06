@@ -1,6 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  useAccount,
+  useChainId,
+  usePublicClient,
+  useWriteContract,
+} from 'wagmi';
+import { erc1155Abi, erc721Abi, isAddress, parseUnits } from 'viem';
+import { marketplaceAddress, useWriteMarketplaceList } from '@/generated';
 
 interface ListECTokenFormProps {
   onSuccess: () => void;
@@ -12,71 +20,73 @@ export function ListECTokenForm({ onSuccess }: ListECTokenFormProps) {
   const [tokenType, setTokenType] = useState<'ERC721' | 'ERC1155'>('ERC721');
   const [price, setPrice] = useState('');
   const [isListing, setIsListing] = useState(false);
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
+  const { writeContractAsync: writeToken } = useWriteContract();
+  const { writeContractAsync: listToken } = useWriteMarketplaceList();
+  const marketplace = marketplaceAddress[chainId];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsListing(true);
 
     try {
-      // TODO: Web3 Integration - Replace with actual contract calls
-      // Step 1: Validate inputs
-      // if (!isAddress(tokenAddress)) {
-      //   alert('Invalid token address');
-      //   return;
-      // }
+      if (!isConnected || !address) {
+        alert('Please connect your wallet first.');
+        return;
+      }
+      if (!publicClient) {
+        alert('Wallet client not ready.');
+        return;
+      }
+      if (!marketplace) {
+        alert('Marketplace is not available on this network.');
+        return;
+      }
+      if (!isAddress(tokenAddress)) {
+        alert('Invalid token address.');
+        return;
+      }
+      if (!tokenId.trim() || Number.isNaN(Number(tokenId))) {
+        alert('Invalid token ID.');
+        return;
+      }
+      if (!price.trim() || Number(price) <= 0) {
+        alert('Invalid price.');
+        return;
+      }
 
-      // Step 2: Check token ownership
-      // const tokenContract = getContract({
-      //   address: tokenAddress,
-      //   abi: tokenType === 'ERC721' ? ERC721ABI : ERC1155ABI,
-      // });
-      // const owner = await tokenContract.read.ownerOf([tokenId]);
-      // if (owner !== userAddress) {
-      //   alert('You do not own this token');
-      //   return;
-      // }
+      const tokenIdValue = BigInt(tokenId);
+      const priceInSmallestUnit = parseUnits(price, 6);
 
-      // Step 3: Check/request approval
-      // if (tokenType === 'ERC721') {
-      //   const approved = await tokenContract.read.getApproved([tokenId]);
-      //   if (approved !== marketplaceAddress) {
-      //     console.log('Approving token for marketplace...');
-      //     const approveTx = await tokenContract.write.approve([marketplaceAddress, tokenId]);
-      //     await approveTx.wait();
-      //   }
-      // } else {
-      //   const isApproved = await tokenContract.read.isApprovedForAll([userAddress, marketplaceAddress]);
-      //   if (!isApproved) {
-      //     console.log('Approving all tokens for marketplace...');
-      //     const approveTx = await tokenContract.write.setApprovalForAll([marketplaceAddress, true]);
-      //     await approveTx.wait();
-      //   }
-      // }
+      if (tokenType === 'ERC721') {
+        const approveHash = await writeToken({
+          address: tokenAddress,
+          abi: erc721Abi,
+          functionName: 'approve',
+          args: [marketplace, tokenIdValue],
+        });
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
+      } else {
+        const approveHash = await writeToken({
+          address: tokenAddress,
+          abi: erc1155Abi,
+          functionName: 'setApprovalForAll',
+          args: [marketplace, true],
+        });
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
+      }
 
-      // Step 4: List on marketplace
-      // const priceInSmallestUnit = parseUnits(price, 6); // USDC has 6 decimals
-      // console.log('Listing token on marketplace...');
-      // const listTx = await marketplaceContract.write.list([
-      //   tokenAddress,
-      //   tokenId,
-      //   tokenType === 'ERC721' ? 0 : 1, // TokenType enum
-      //   priceInSmallestUnit
-      // ]);
-      // await listTx.wait();
-
-      // Step 5: Listen for Listed event
-      // marketplace.on('Listed', (listingId, seller, token, tokenId, price) => {
-      //   console.log('Token listed successfully');
-      // });
-
-      console.log('Listing token:', {
-        tokenAddress,
-        tokenId,
-        tokenType,
-        price,
+      const listHash = await listToken({
+        args: [
+          tokenAddress,
+          tokenIdValue,
+          tokenType === 'ERC721' ? 0 : 1,
+          priceInSmallestUnit,
+        ],
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await publicClient.waitForTransactionReceipt({ hash: listHash });
 
       alert('Token listed successfully!');
       setTokenAddress('');

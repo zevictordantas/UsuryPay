@@ -1,6 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
+import { useAccount, useChainId, usePublicClient } from 'wagmi';
+import { formatUnits } from 'viem';
+import {
+  marketplaceAddress,
+  useReadMarketplaceGetAllListings,
+  useWriteMarketplaceCancel,
+} from '@/generated';
 
 interface UserListing {
   listingId: string;
@@ -16,83 +23,55 @@ interface UserListingsProps {
   onCancelled: () => void;
 }
 
-// Mock user listings - will be replaced with Web3 calls
-const mockUserListings: UserListing[] = [
-  {
-    listingId: '7',
-    tokenId: '42',
-    tokenAddress: '0xECToken007',
-    tokenType: 'ERC721',
-    price: 15000,
-    listedAt: Date.now() - 86400000 * 2,
-    active: true,
-  },
-  {
-    listingId: '8',
-    tokenId: '99',
-    tokenAddress: '0xECToken008',
-    tokenType: 'ERC721',
-    price: 8500,
-    listedAt: Date.now() - 86400000 * 5,
-    active: true,
-  },
-];
-
 export function UserListings({ onCancelled }: UserListingsProps) {
-  const [listings, setListings] = useState<UserListing[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
+  const hasMarketplace = Boolean(marketplaceAddress[chainId]);
+  const {
+    data: allListings,
+    isLoading,
+    isError,
+    refetch,
+  } = useReadMarketplaceGetAllListings({
+    query: {
+      enabled: isConnected && hasMarketplace,
+    },
+  });
+  const { writeContractAsync: cancelListing } = useWriteMarketplaceCancel();
 
-  useEffect(() => {
-    const fetchUserListings = async () => {
-      setIsLoading(true);
-      try {
-        // TODO: Web3 Integration - Replace with actual contract calls
-        // const allListings = await marketplaceContract.read.getAllListings();
-        // const userListings = allListings.filter(
-        //   listing => listing.seller === userAddress && listing.active
-        // );
-        // setListings(userListings.map(listing => ({
-        //   listingId: listing.id.toString(),
-        //   tokenId: listing.tokenId.toString(),
-        //   tokenAddress: listing.tokenAddress,
-        //   tokenType: listing.tokenType === 0 ? 'ERC721' : 'ERC1155',
-        //   price: Number(listing.price) / 1e6, // Convert from USDC smallest unit
-        //   listedAt: Date.now(), // Would need to track this separately
-        //   active: listing.active
-        // })));
-
-        setTimeout(() => {
-          setListings(mockUserListings);
-          setIsLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error('Failed to fetch user listings:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserListings();
-  }, []);
+  const listings = useMemo(() => {
+    if (!allListings || !address) return [];
+    return allListings
+      .filter((listing) => listing.active && listing.seller === address)
+      .map((listing) => {
+        return {
+          listingId: listing.id.toString(),
+          tokenId: listing.tokenId.toString(),
+          tokenAddress: listing.tokenAddress,
+          tokenType: listing.tokenType === 0 ? 'ERC721' : 'ERC1155',
+          price: Number(formatUnits(listing.price, 6)),
+          listedAt: Date.now(),
+          active: listing.active,
+        } satisfies UserListing;
+      });
+  }, [allListings, address]);
 
   const handleCancel = async (listingId: string) => {
     setCancellingId(listingId);
     try {
-      // TODO: Web3 Integration - Replace with actual contract calls
-      // console.log('Cancelling listing...');
-      // const cancelTx = await marketplaceContract.write.cancel([listingId]);
-      // await cancelTx.wait();
-
-      // Listen for Cancelled event
-      // marketplace.on('Cancelled', (listingId, seller) => {
-      //   console.log('Listing cancelled successfully');
-      // });
-
-      console.log('Cancelling listing:', listingId);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!publicClient) {
+        alert('Wallet client not ready.');
+        return;
+      }
+      const cancelHash = await cancelListing({
+        args: [BigInt(listingId)],
+      });
+      await publicClient.waitForTransactionReceipt({ hash: cancelHash });
 
       alert('Listing cancelled successfully! Token returned to your wallet.');
-      setListings(listings.filter((l) => l.listingId !== listingId));
+      await refetch();
       onCancelled();
     } catch (error) {
       console.error('Failed to cancel listing:', error);
@@ -113,6 +92,36 @@ export function UserListings({ onCancelled }: UserListingsProps) {
     return `${days} days ago`;
   };
 
+  if (!isConnected) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Your Active Listings
+        </h2>
+        <div className="py-8 text-center">
+          <p className="text-sm text-gray-500">
+            Connect your wallet to view your listings.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasMarketplace) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Your Active Listings
+        </h2>
+        <div className="py-8 text-center">
+          <p className="text-sm text-gray-500">
+            Marketplace is not deployed on this network.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -122,6 +131,21 @@ export function UserListings({ onCancelled }: UserListingsProps) {
         <div className="py-8 text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
           <p className="text-sm text-gray-500">Loading your listings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Your Active Listings
+        </h2>
+        <div className="py-8 text-center">
+          <p className="text-sm text-gray-500">
+            Failed to load your listings. Please try again.
+          </p>
         </div>
       </div>
     );

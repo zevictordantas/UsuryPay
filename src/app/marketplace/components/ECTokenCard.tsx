@@ -1,6 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  useAccount,
+  useChainId,
+  usePublicClient,
+  useReadContract,
+  useWriteContract,
+} from 'wagmi';
+import { erc20Abi, formatUnits } from 'viem';
+import {
+  marketplaceAddress,
+  useReadMarketplaceUsdc,
+  useWriteMarketplaceBuy,
+} from '@/generated';
 import { MarketplaceToken } from './MarketplaceListings';
 
 interface ECTokenCardProps {
@@ -10,38 +23,74 @@ interface ECTokenCardProps {
 export function ECTokenCard({ token }: ECTokenCardProps) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const publicClient = usePublicClient();
+  const marketplace = marketplaceAddress[chainId];
+  const { data: usdcAddress } = useReadMarketplaceUsdc({
+    query: { enabled: Boolean(marketplace) },
+  });
+  const { writeContractAsync: writeUsdc } = useWriteContract();
+  const { writeContractAsync: buyListing } = useWriteMarketplaceBuy();
+  const { refetch: refetchAllowance } = useReadContract({
+    address: usdcAddress,
+    abi: erc20Abi,
+    functionName: 'allowance',
+    args: address && marketplace ? [address, marketplace] : undefined,
+    query: {
+      enabled: Boolean(usdcAddress && address && marketplace),
+    },
+  });
+  const { refetch: refetchBalance } = useReadContract({
+    address: usdcAddress,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: Boolean(usdcAddress && address),
+    },
+  });
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
     try {
-      // TODO: Web3 Integration - Replace with actual contract calls
-      // Step 1: Check USDC balance
-      // const usdcBalance = await usdcContract.read.balanceOf([userAddress]);
-      // if (usdcBalance < token.askPrice) {
-      //   alert('Insufficient USDC balance');
-      //   return;
-      // }
+      if (!isConnected || !address) {
+        alert('Please connect your wallet first.');
+        return;
+      }
+      if (!marketplace || !usdcAddress) {
+        alert('Marketplace is not available on this network.');
+        return;
+      }
+      if (!publicClient) {
+        alert('Wallet client not ready.');
+        return;
+      }
 
-      // Step 2: Check USDC allowance
-      // const allowance = await usdcContract.read.allowance([userAddress, marketplaceAddress]);
-      // if (allowance < token.askPrice) {
-      //   console.log('Approving USDC...');
-      //   const approveTx = await usdcContract.write.approve([marketplaceAddress, token.askPrice]);
-      //   await approveTx.wait();
-      // }
+      const balanceResult = await refetchBalance();
+      const balance = (balanceResult.data ?? 0n) as bigint;
+      if (balance < token.askPriceRaw) {
+        const formattedBalance = formatUnits(balance, 6);
+        alert(`Insufficient USDC balance (${formattedBalance}).`);
+        return;
+      }
 
-      // Step 3: Execute purchase
-      // console.log('Purchasing token...');
-      // const buyTx = await marketplaceContract.write.buy([token.listingId]);
-      // await buyTx.wait();
+      const allowanceResult = await refetchAllowance();
+      const allowance = (allowanceResult.data ?? 0n) as bigint;
+      if (allowance < token.askPriceRaw) {
+        const approveHash = await writeUsdc({
+          address: usdcAddress,
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [marketplace, token.askPriceRaw],
+        });
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
+      }
 
-      // Step 4: Listen for Bought event
-      // marketplace.on('Bought', (listingId, buyer, seller, price) => {
-      //   console.log('Token purchased successfully');
-      // });
-
-      console.log('Purchasing listing:', token.listingId, 'Token:', token.tokenId);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const buyHash = await buyListing({
+        args: [token.listingIdRaw],
+      });
+      await publicClient.waitForTransactionReceipt({ hash: buyHash });
 
       alert('Purchase successful! Token transferred to your wallet.');
       window.location.reload();
@@ -60,6 +109,8 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       subscription: 'SUBSCRIPTION',
       dividend: 'DIVIDEND',
       other: 'OTHER',
+      erc721: 'ERC-721',
+      erc1155: 'ERC-1155',
     };
     return labels[type] || 'UNKNOWN';
   };
@@ -71,6 +122,8 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       subscription: 'bg-green-100 text-green-800',
       dividend: 'bg-yellow-100 text-yellow-800',
       other: 'bg-gray-100 text-gray-800',
+      erc721: 'bg-gray-100 text-gray-800',
+      erc1155: 'bg-gray-100 text-gray-800',
     };
     return colors[type] || 'bg-gray-100 text-gray-800';
   };
@@ -91,10 +144,12 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
   };
 
   const formatAddress = (address: string) => {
+    if (address.length <= 10) return address;
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   const calculateAPR = () => {
+    if (token.durationDays <= 0 || token.askPrice <= 0) return '0.0';
     const totalReturn =
       ((token.futureValue - token.askPrice) / token.askPrice) * 100;
     const annualizedReturn = (totalReturn * 365) / token.durationDays;
@@ -104,7 +159,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
   const getTimeRemaining = () => {
     const remainingSeconds = token.endTime - Date.now() / 1000;
     const remainingDays = Math.ceil(remainingSeconds / 86400);
-    return remainingDays;
+    return Math.max(remainingDays, 0);
   };
 
   return (

@@ -7,10 +7,16 @@ export default defineConfig({
   plugins: [
     foundry({
       project: './contracts',
-      include: ['Marketplace.sol/**'],
+      include: ['Marketplace.sol/**', 'MockUSDC.sol/**', 'MockECToken.sol/**'],
       deployments: {
         Marketplace: {
           31337: deployments.Marketplace as `0x${string}`,
+        },
+        MockUSDC: {
+          31337: deployments.MockUSDC as `0x${string}`,
+        },
+        MockECToken: {
+          31337: deployments.MockECToken as `0x${string}`,
         },
       },
     }),

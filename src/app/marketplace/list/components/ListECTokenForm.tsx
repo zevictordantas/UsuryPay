@@ -25,7 +25,7 @@ export function ListECTokenForm({ onSuccess }: ListECTokenFormProps) {
   const publicClient = usePublicClient();
   const { writeContractAsync: writeToken } = useWriteContract();
   const { writeContractAsync: listToken } = useWriteMarketplaceList();
-  const marketplace = marketplaceAddress[chainId];
+  const marketplace = marketplaceAddress[chainId as keyof typeof marketplaceAddress];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

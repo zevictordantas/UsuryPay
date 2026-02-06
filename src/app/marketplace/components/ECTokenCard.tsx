@@ -26,7 +26,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
-  const marketplace = marketplaceAddress[chainId];
+  const marketplace = marketplaceAddress[chainId as keyof typeof marketplaceAddress];
   const { data: usdcAddress } = useReadMarketplaceUsdc({
     query: { enabled: Boolean(marketplace) },
   });
@@ -68,7 +68,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       }
 
       const balanceResult = await refetchBalance();
-      const balance = (balanceResult.data ?? 0n) as bigint;
+      const balance = (balanceResult.data ?? BigInt(0)) as bigint;
       if (balance < token.askPriceRaw) {
         const formattedBalance = formatUnits(balance, 6);
         alert(`Insufficient USDC balance (${formattedBalance}).`);
@@ -76,7 +76,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       }
 
       const allowanceResult = await refetchAllowance();
-      const allowance = (allowanceResult.data ?? 0n) as bigint;
+      const allowance = (allowanceResult.data ?? BigInt(0)) as bigint;
       if (allowance < token.askPriceRaw) {
         const approveHash = await writeUsdc({
           address: usdcAddress,

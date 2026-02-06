@@ -93,4 +93,10 @@ contract MockECToken is ERC1155 {
         _tokenInfo[tokenId].claimed = claimed + amount;
         emit Claimed(tokenId, amount, claimed + amount);
     }
+
+    function updateClaimed(uint256 tokenId, uint256 amount) external {
+        require(_vaults[_tokenInfo[tokenId].vaultId] == msg.sender, "Only vault can update claimed");
+        _tokenInfo[tokenId].claimed += amount;
+        emit Claimed(tokenId, amount, _tokenInfo[tokenId].claimed);
+    }
 }

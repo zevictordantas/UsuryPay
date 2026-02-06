@@ -49,7 +49,7 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
   const [now, setNow] = useState<number | null>(null);
   const { isConnected } = useAccount();
   const chainId = useChainId();
-  const hasMarketplace = Boolean(marketplaceAddress[chainId]);
+  const hasMarketplace = Boolean(marketplaceAddress[chainId as keyof typeof marketplaceAddress]);
   const {
     data: listings,
     isLoading,

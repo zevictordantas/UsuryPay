@@ -13,6 +13,9 @@ export default defineConfig({
         'Marketplace.sol/**',
         'MockUSDC.sol/**',
         'MockECToken.sol/**',
+        'PayrollVault.sol/**',
+        'PayrollVaultFactory.sol/**',
+        'PayrollDApp.sol/**',
       ],
       deployments: {
         Marketplace: {
@@ -24,8 +27,18 @@ export default defineConfig({
         MockECToken: {
           31337: deployments.MockECToken as `0x${string}`,
         },
-        // TODO: RBNPrimitive not added, we need to use ECToken (and this token is actually minted by ECVault, not by Deploy.s.sol)
-        // TODO: same as above for SettlementManager
+        PayrollVaultFactory: {
+          31337: deployments.PayrollVaultFactory as `0x${string}`,
+        },
+        PayrollDApp: {
+          31337: deployments.PayrollDApp as `0x${string}`,
+        },
+        RBNPrimitive: {
+          31337: deployments.RBNPrimitive as `0x${string}`,
+        },
+        SettlementManager: {
+          31337: deployments.SettlementManager as `0x${string}`,
+        },
       },
     }),
     react(),

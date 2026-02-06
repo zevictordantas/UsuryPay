@@ -28,7 +28,7 @@ export function UserListings({ onCancelled }: UserListingsProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
-  const hasMarketplace = Boolean(marketplaceAddress[chainId]);
+  const hasMarketplace = Boolean(marketplaceAddress[chainId as keyof typeof marketplaceAddress]);
   const {
     data: allListings,
     isLoading,

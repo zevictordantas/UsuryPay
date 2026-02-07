@@ -43,7 +43,7 @@ export default function Home() {
             (EC) enables future cash flow holders to receive instant liquidity
             and rewards &quot;usurers&quot; for assuming the risk.
             <Link
-              href="#"
+              href="presentation"
               className="ml-2 rounded bg-zinc-900 px-2 py-0.5 text-white transition-colors hover:bg-zinc-700"
             >
               Learn More

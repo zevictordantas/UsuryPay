@@ -8,6 +8,7 @@
     "wagmi:generate": "wagmi generate",
     "wagmi:watch": "wagmi generate --watch",
     "dev": "next dev",
+    "dev:local": "pnpm deploy:local && pnpm wagmi:generate && pnpm dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -25,6 +26,7 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "reveal.js": "^5.2.1",
     "viem": "^2.45.1",
     "wagmi": "^3.4.2"
   },
@@ -33,6 +35,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/reveal.js": "^5.2.2",
     "@wagmi/cli": "^2.9.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",

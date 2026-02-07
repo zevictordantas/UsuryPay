@@ -51,5 +51,5 @@ contracts/out/
 
 # Foundry broadcast - track production/testnet, ignore local anvil
 # See: https://book.getfoundry.sh/tutorials/best-practices#scripts
-contracts/broadcast/*/31337/      # Ignore local anvil (chain ID 31337)
-contracts/broadcast/*/dry-run/    # Ignore dry runs
+contracts/broadcast/*/31337/
+contracts/broadcast/*/dry-run/

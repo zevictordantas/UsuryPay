@@ -3,10 +3,15 @@
 import { useState, useEffect } from 'react';
 import { type Address, formatUnits } from 'viem';
 import { useAccount, useChainId, useReadContracts } from 'wagmi';
-import { useReadTokenInfo, useReadClaimable, useReadTokenBalance } from '@/contracts/hooks/useMockECToken';
-import { useClaimFromVault, useReadEmployerCreditScore } from '@/contracts/hooks/usePayrollVault';
+import {
+  useReadMockEcTokenGetTokenInfo,
+  useReadMockEcTokenGetClaimable,
+  useReadMockEcTokenBalanceOf,
+  useReadPayrollVaultGetEmployerCreditScore,
+  useWritePayrollVaultClaim,
+  mockEcTokenAbi,
+} from '@/generated';
 import { addresses } from '@/contracts/addresses';
-import { mockEcTokenAbi } from '@/generated';
 
 interface ECTokenPortfolioListProps {
   onStatusChanged?: () => void;
@@ -19,14 +24,26 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
 }) {
   const { address: employeeAddress } = useAccount();
 
-  const { data: tokenInfo } = useReadTokenInfo(ecTokenAddress, tokenId);
-  const { data: claimable } = useReadClaimable(ecTokenAddress, tokenId);
-  const { data: balance } = useReadTokenBalance(ecTokenAddress, employeeAddress, tokenId);
+  const { data: tokenInfo } = useReadMockEcTokenGetTokenInfo({
+    args: [tokenId],
+    query: { enabled: !!tokenId },
+  });
+  const { data: claimable } = useReadMockEcTokenGetClaimable({
+    args: [tokenId],
+    query: { enabled: !!tokenId },
+  });
+  const { data: balance } = useReadMockEcTokenBalanceOf({
+    args: employeeAddress && tokenId ? [employeeAddress, tokenId] : undefined,
+    query: { enabled: !!employeeAddress && !!tokenId },
+  });
 
   const vaultAddress = tokenInfo ? (tokenInfo as any)[1] : undefined; // Get vault from tokenInfo
-  const { data: creditScore } = useReadEmployerCreditScore(vaultAddress as Address);
+  const { data: creditScore } = useReadPayrollVaultGetEmployerCreditScore({
+    address: vaultAddress as Address,
+    query: { enabled: !!vaultAddress },
+  });
 
-  const { claim, isPending: isClaiming } = useClaimFromVault();
+  const { writeContractAsync: claim, isPending: isClaiming } = useWritePayrollVaultClaim();
 
   if (!tokenInfo || !balance || Number(balance) === 0) {
     return null;
@@ -66,7 +83,10 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
     if (!vaultAddress || claimableAmount <= 0) return;
 
     try {
-      await claim(vaultAddress as Address, tokenId, claimable!);
+      await claim({
+        address: vaultAddress as Address,
+        args: [tokenId, claimable!],
+      });
       alert('Salary claimed successfully!');
       onClaimed?.();
     } catch (error) {
@@ -179,21 +199,37 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
     })),
     query: {
       enabled: !!ecTokenAddress && !!employeeAddress,
+      refetchInterval: 5000, // Refetch every 5 seconds
     },
   });
 
   useEffect(() => {
     if (balanceChecks.data) {
+      console.log('Balance checks data:', balanceChecks.data);
+      console.log('Employee address:', employeeAddress);
+      console.log('ECToken address:', ecTokenAddress);
+
       const owned = tokenIdsToCheck.filter((tokenId, index) => {
         const result = balanceChecks.data?.[index] as any;
-        if (!result || result.status !== 'success') return false;
+        if (!result || result.status !== 'success') {
+          if (result?.status === 'failure') {
+            console.log(`Token ${tokenId} check failed:`, result.error);
+          }
+          return false;
+        }
         const balance = result.result as bigint;
-        return balance && Number(balance) > 0;
+        const hasBalance = balance && Number(balance) > 0;
+        if (hasBalance) {
+          console.log(`Employee owns token ${tokenId} with balance ${balance}`);
+        }
+        return hasBalance;
       });
+
+      console.log('Owned token IDs:', owned);
       setOwnedTokenIds(owned);
       setIsScanning(false);
     }
-  }, [balanceChecks.data]);
+  }, [balanceChecks.data, employeeAddress, ecTokenAddress]);
 
   if (!employeeAddress) {
     return (

@@ -2,22 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { type Address, type Hex, formatUnits } from 'viem';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useReadContracts } from 'wagmi';
 import {
-  useReadTokenInfo,
-  useReadClaimable,
-  useReadTokenBalance,
-  useApproveToken,
-} from '@/contracts/hooks/useMockECToken';
-import {
-  useRequestQuote,
-  useAcceptOffer,
-  useReadECTokenValue,
-  useReadOffer,
-} from '@/contracts/hooks/usePayrollDApp';
+  useReadMockEcTokenGetTokenInfo,
+  useReadMockEcTokenGetClaimable,
+  useWriteMockEcTokenSetApprovalForAll,
+  useWritePayrollDAppRequestQuote,
+  useWritePayrollDAppAcceptOffer,
+  useReadPayrollDAppGetEcTokenValue,
+  useReadPayrollDAppGetOffer,
+  mockEcTokenAbi,
+} from '@/generated';
 import { addresses } from '@/contracts/addresses';
-import { mockEcTokenAbi } from '@/generated';
-import { useReadContracts } from 'wagmi';
 
 interface ECTokenSaleCardProps {
   onSuccess?: () => void;
@@ -67,14 +63,26 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
   const selectedTokenIdBigInt = selectedTokenId ? BigInt(selectedTokenId) : undefined;
 
-  const { data: tokenInfo } = useReadTokenInfo(ecTokenAddress!, selectedTokenIdBigInt);
-  const { data: claimable } = useReadClaimable(ecTokenAddress!, selectedTokenIdBigInt);
-  const { data: ecTokenValue } = useReadECTokenValue(dappAddress!, selectedTokenIdBigInt);
-  const { data: currentOffer } = useReadOffer(dappAddress!, currentOfferHash);
+  const { data: tokenInfo } = useReadMockEcTokenGetTokenInfo({
+    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    query: { enabled: selectedTokenIdBigInt !== undefined },
+  });
+  const { data: claimable } = useReadMockEcTokenGetClaimable({
+    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    query: { enabled: selectedTokenIdBigInt !== undefined },
+  });
+  const { data: ecTokenValue } = useReadPayrollDAppGetEcTokenValue({
+    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    query: { enabled: selectedTokenIdBigInt !== undefined && !!dappAddress },
+  });
+  const { data: currentOffer } = useReadPayrollDAppGetOffer({
+    args: currentOfferHash ? [currentOfferHash] : undefined,
+    query: { enabled: !!currentOfferHash && !!dappAddress },
+  });
 
-  const { requestQuote, isPending: isRequestingQuoteTx } = useRequestQuote();
-  const { acceptOffer, isPending: isAcceptingOffer } = useAcceptOffer();
-  const { setApprovalForAll, isPending: isApproving } = useApproveToken();
+  const { writeContractAsync: requestQuote, isPending: isRequestingQuoteTx } = useWritePayrollDAppRequestQuote();
+  const { writeContractAsync: acceptOffer, isPending: isAcceptingOffer } = useWritePayrollDAppAcceptOffer();
+  const { writeContractAsync: setApprovalForAll, isPending: isApproving } = useWriteMockEcTokenSetApprovalForAll();
 
   const handleRequestQuote = async () => {
     if (!selectedTokenIdBigInt || !dappAddress || !ecTokenAddress) return;
@@ -82,7 +90,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
     setIsRequestingQuote(true);
     try {
       console.log('Requesting quote for token:', selectedTokenIdBigInt.toString());
-      const hash = await requestQuote(dappAddress, selectedTokenIdBigInt);
+      const hash = await requestQuote({
+        args: [selectedTokenIdBigInt],
+      });
       console.log('Quote requested, tx hash:', hash);
 
       // The quote transaction doesn't return the offer hash directly,
@@ -109,11 +119,15 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
     try {
       // First approve EC token transfer
       console.log('Approving EC token transfer...');
-      await setApprovalForAll(ecTokenAddress, dappAddress, true);
+      await setApprovalForAll({
+        args: [dappAddress, true],
+      });
 
       // Then accept offer
       console.log('Accepting offer...');
-      await acceptOffer(dappAddress, currentOfferHash);
+      await acceptOffer({
+        args: [currentOfferHash],
+      });
 
       alert('Token sold successfully!');
       setSelectedTokenId('');

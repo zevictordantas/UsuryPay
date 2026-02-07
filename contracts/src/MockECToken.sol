@@ -30,6 +30,7 @@ contract MockECToken is ERC1155 {
     uint256 private _nextTokenId;
     mapping(uint256 => TokenInfo) private _tokenInfo;
     mapping(uint256 => address) private _vaults;
+    mapping(uint256 => address) private _tokenRecipients;
 
     constructor() ERC1155("") {}
 
@@ -43,6 +44,10 @@ contract MockECToken is ERC1155 {
 
     function getVault(uint256 tokenId) external view returns (address) {
         return _vaults[_tokenInfo[tokenId].vaultId];
+    }
+
+    function getTokenRecipient(uint256 tokenId) external view returns (address) {
+        return _tokenRecipients[tokenId];
     }
 
     function calculateEntitled(uint256 tokenId, uint256 timestamp) public view returns (uint256 entitled) {
@@ -79,6 +84,7 @@ contract MockECToken is ERC1155 {
     {
         tokenId = ++_nextTokenId;
         _tokenInfo[tokenId] = TokenInfo({vaultId: vaultId, schedule: schedule, claimed: 0, metadata: metadata});
+        _tokenRecipients[tokenId] = recipient; // Store original recipient
         _mint(recipient, tokenId, 1, "");
         emit TokenMinted(tokenId, vaultId, recipient);
     }

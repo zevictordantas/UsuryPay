@@ -41,10 +41,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# wagmi generated
+# wagmi generated (regenerated on deploy)
 src/generated.ts
 deployments.json
+
 # Foundry
 contracts/cache/
 contracts/out/
-contracts/broadcast/
+
+# Foundry broadcast - track production/testnet, ignore local anvil
+# See: https://book.getfoundry.sh/tutorials/best-practices#scripts
+contracts/broadcast/*/31337/      # Ignore local anvil (chain ID 31337)
+contracts/broadcast/*/dry-run/    # Ignore dry runs

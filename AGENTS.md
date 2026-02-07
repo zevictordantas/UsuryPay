@@ -26,6 +26,59 @@ forge test     # Run tests
 forge fmt      # Format contracts
 ```
 
+## ⚠️ CRITICAL: Never Hardcode Contract Addresses
+
+**Problem**: Contract addresses change frequently in development and vary by chain/environment.
+
+**Why This Matters**:
+- **Local (Anvil)**: Addresses change on EVERY redeploy (multiple times per day)
+- **Testnet/Mainnet**: Addresses change on redeployments or upgrades
+- **Multi-chain**: Same contract = different address per chain
+- **Environments**: Dev/staging/prod may have different addresses
+
+**❌ NEVER Do This**:
+```typescript
+// WRONG - Hardcoded address
+const TOKEN_ADDRESS = '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9';
+
+// WRONG - Manually typed addresses
+export const addresses = {
+  31337: {
+    mockECToken: '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
+  }
+};
+```
+
+**✅ ALWAYS Do This**:
+```typescript
+// RIGHT - Import from deployment artifact
+import deployments from '../../deployments.json';
+
+export const addresses = {
+  [ANVIL_CHAIN_ID]: {
+    mockECToken: deployments.MockECToken as Address,
+  }
+};
+```
+
+**Foundry Best Practices**:
+- Track `contracts/broadcast/` for production/testnet (deployment history)
+- Only ignore `contracts/broadcast/*/31337/` (local anvil)
+- Use broadcast JSON files as deployment source of truth
+- See: https://book.getfoundry.sh/tutorials/best-practices#scripts
+
+**Deployment Workflow**:
+1. Deploy: `pnpm deploy:local` → Updates `deployments.json`
+2. Generate: `pnpm wagmi:generate` → Generates hooks with new addresses
+3. Frontend: Imports from `deployments.json` (auto-synced)
+
+**If You Must Reference Addresses**:
+- Smart contracts: Use constructor injection or setter functions
+- Frontend: Import from `deployments.json` or use wagmi-generated hooks
+- Scripts: Read from `broadcast/<script>/<chainId>/run-latest.json`
+
+---
+
 ## Code Style Guidelines
 
 ### File Structure & Organization
@@ -89,6 +142,25 @@ import type { CashflowNFT } from '@/types';
 - Viem for typed contract interactions
 - React Query for server state management and caching
 - Handle loading/error states explicitly
+
+### Wagmi Hook Usage Rule
+
+**RULE**: **Always use wagmi-generated hooks directly. Never create custom wrapper hooks around wagmi functionality.**
+
+**Implementation**:
+
+- Import hooks directly from `@/generated`
+- For dynamic addresses: `useReadContractName({ address: dynamicAddress, args })`
+- For static addresses: `useReadContractName({ args })`
+- Use wagmi CLI (`pnpm wagmi:generate`) to regenerate hooks after contract changes
+
+**Exceptions** (only for complex business logic):
+
+- Multi-step operations requiring custom state management
+- Cross-contract interactions with combined logic
+- Hooks that add significant processing beyond simple contract calls
+
+**Rationale**: wagmi codegen provides optimal, type-safe hooks. Custom wrappers violate minimalism principle and create maintenance burden. Generated hooks handle both static and dynamic address patterns correctly.
 
 ### Error Handling
 

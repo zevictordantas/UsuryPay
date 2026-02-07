@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { type Address, parseUnits, formatUnits, isAddress } from 'viem';
 import { useChainId } from 'wagmi';
-import { useMintSalaryToken } from '@/contracts/hooks/usePayrollVault';
-import { useReadVaultBalance, useReadRequiredEscrow } from '@/contracts/hooks/usePayrollVault';
+import {
+  useWritePayrollVaultMintSalaryToken,
+  useReadPayrollVaultGetBalance,
+  useReadPayrollVaultGetRequiredEscrow,
+} from '@/generated';
 
 interface MintECTokenFormProps {
   vaultAddress: Address;
@@ -19,9 +22,15 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
   });
 
   const chainId = useChainId();
-  const { mintSalaryToken, isPending } = useMintSalaryToken();
-  const { data: balance } = useReadVaultBalance(vaultAddress);
-  const { data: requiredEscrow } = useReadRequiredEscrow(vaultAddress);
+  const { writeContractAsync: mintSalaryToken, isPending } = useWritePayrollVaultMintSalaryToken();
+  const { data: balance } = useReadPayrollVaultGetBalance({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
+  const { data: requiredEscrow } = useReadPayrollVaultGetRequiredEscrow({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
 
   const vaultBalance = balance ? Number(formatUnits(balance, 6)) : 0;
   const vaultRequiredEscrow = requiredEscrow ? Number(formatUnits(requiredEscrow, 6)) : 0;
@@ -59,12 +68,14 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
         duration: durationMonths,
       });
 
-      await mintSalaryToken(
-        vaultAddress,
-        formData.employeeAddress as Address,
-        monthlyAmountInWei,
-        durationMonths
-      );
+      await mintSalaryToken({
+        address: vaultAddress,
+        args: [
+          formData.employeeAddress as Address,
+          monthlyAmountInWei,
+          BigInt(durationMonths),
+        ],
+      });
 
       alert('EC Token minted successfully!');
 

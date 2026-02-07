@@ -138,6 +138,19 @@ Minimal local flow (see `package.json` scripts):
 3. Generate wagmi hooks into `src/generated.ts`: `pnpm wagmi:generate` (or `pnpm wagmi:watch`)
 4. Start app: `pnpm dev`
 
+### Wagmi Hook Development Rules
+
+**RULE**: Always use wagmi-generated hooks directly. Never create custom wrapper hooks.
+
+**Implementation**:
+
+- Import hooks directly from `@/generated`
+- For dynamic addresses: `useReadContractName({ address: dynamicAddress, args })`
+- For static addresses: `useReadContractName({ args })`
+- Never create custom wrappers around wagmi functionality
+
+**Exceptions**: Complex multi-step business logic only.
+
 Local deploy also creates `MockUSDC` and a `MockECToken` (one token minted to the deployer) for marketplace testing.
 
 ## Environment-Based Chains

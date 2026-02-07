@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react';
 import { type Address, formatUnits } from 'viem';
 import { useChainId } from 'wagmi';
-import { useReadMintedTokens } from '@/contracts/hooks/usePayrollVault';
-import { useReadTokenInfo } from '@/contracts/hooks/useMockECToken';
+import {
+  useReadPayrollVaultGetMintedTokens,
+  useReadMockEcTokenGetTokenInfo,
+  useReadMockEcTokenGetTokenRecipient,
+} from '@/generated';
 import { addresses } from '@/contracts/addresses';
 
 interface MintedECTokensListProps {
@@ -13,12 +16,31 @@ interface MintedECTokensListProps {
 }
 
 function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress: Address }) {
-  const { data: tokenInfo } = useReadTokenInfo(ecTokenAddress, tokenId);
+  const { data: tokenInfo, isLoading, error } = useReadMockEcTokenGetTokenInfo({
+    args: [tokenId],
+    query: { enabled: !!tokenId },
+  });
 
-  if (!tokenInfo) {
+  const { data: recipient } = useReadMockEcTokenGetTokenRecipient({
+    args: [tokenId],
+    query: { enabled: !!tokenId },
+  });
+
+  if (error) {
+    console.error('Error loading token info:', error);
     return (
       <tr className="border-b border-gray-100">
-        <td className="py-4" colSpan={4}>
+        <td className="py-4" colSpan={5}>
+          <div className="text-sm text-red-500">Error loading token #{tokenId.toString()}</div>
+        </td>
+      </tr>
+    );
+  }
+
+  if (isLoading || !tokenInfo) {
+    return (
+      <tr className="border-b border-gray-100">
+        <td className="py-4" colSpan={5}>
           <div className="text-sm text-gray-500">Loading token #{tokenId.toString()}...</div>
         </td>
       </tr>
@@ -33,10 +55,6 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
   const duration = Number(tokenInfo.schedule.endTime) - Number(tokenInfo.schedule.startTime);
   const elapsed = Math.max(0, Math.min(now - Number(tokenInfo.schedule.startTime), duration));
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
 
   return (
     <tr className="border-b border-gray-100 last:border-b-0">
@@ -73,6 +91,15 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
           {remaining.toFixed(2)} USDC
         </div>
       </td>
+      <td className="py-4">
+        {recipient ? (
+          <div className="text-xs font-mono text-gray-700" title={recipient}>
+            {recipient.slice(0, 6)}...{recipient.slice(-4)}
+          </div>
+        ) : (
+          <div className="text-xs text-gray-400">Unknown</div>
+        )}
+      </td>
     </tr>
   );
 }
@@ -82,7 +109,10 @@ export function MintedECTokensList({ vaultAddress }: MintedECTokensListProps) {
   const contractAddresses = addresses[chainId as keyof typeof addresses];
   const ecTokenAddress = contractAddresses?.mockECToken;
 
-  const { data: mintedTokens, isLoading } = useReadMintedTokens(vaultAddress);
+  const { data: mintedTokens, isLoading } = useReadPayrollVaultGetMintedTokens({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
 
   if (isLoading) {
     return (
@@ -147,6 +177,9 @@ export function MintedECTokensList({ vaultAddress }: MintedECTokensListProps) {
               </th>
               <th className="pb-3 text-sm font-medium text-gray-700">
                 Remaining
+              </th>
+              <th className="pb-3 text-sm font-medium text-gray-700">
+                Employee
               </th>
             </tr>
           </thead>

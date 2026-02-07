@@ -5,13 +5,14 @@ import { type Address, parseUnits, formatUnits } from 'viem';
 
 import { useChainId, useConnection, useWaitForTransactionReceipt } from 'wagmi';
 import {
-  useReadVaultBalance,
-  useReadRequiredEscrow,
-  useReadEmployerCreditScore,
-  useFundVault,
-} from '@/contracts/hooks/usePayrollVault';
+  useReadPayrollVaultGetBalance,
+  useReadPayrollVaultGetRequiredEscrow,
+  useReadPayrollVaultGetEmployerCreditScore,
+  useWritePayrollVaultFund,
+  useWriteMockUsdcApprove,
+  mockUsdcAddress,
+} from '@/generated';
 import { addresses } from '@/contracts/addresses';
-import { useWriteMockUsdcApprove, mockUsdcAddress } from '@/generated';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface TreasuryCardProps {
@@ -30,13 +31,21 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
   const usdcAddress = contractAddresses?.mockUSDC;
 
   const { data: balance, queryKey: vaultBalanceQueryKey } =
-    useReadVaultBalance(vaultAddress);
-  const { data: requiredEscrow } = useReadRequiredEscrow(vaultAddress);
-  const { data: creditScore } = useReadEmployerCreditScore(vaultAddress);
+    useReadPayrollVaultGetBalance({
+      address: vaultAddress,
+      query: { enabled: !!vaultAddress },
+    });
+  const { data: requiredEscrow } = useReadPayrollVaultGetRequiredEscrow({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
+  const { data: creditScore } = useReadPayrollVaultGetEmployerCreditScore({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
 
-  const { fundVault, isPending: isFunding } = useFundVault();
-  // const { writeContractAsync: approveUsdc } = useWriteContract();
   const writeMockUsdcApprove = useWriteMockUsdcApprove();
+  const { writeContractAsync: fundVault, isPending: isFunding } = useWritePayrollVaultFund();
 
   const {
     isLoading: isWaitingForTxReceiptOfApproval,
@@ -93,7 +102,10 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
       const result = await refetchForTxReceiptOfApproval();
       console.log('result', result);
       console.log('Funding vault...');
-      await fundVault(vaultAddress, amountInWei);
+      await fundVault({
+        address: vaultAddress,
+        args: [amountInWei],
+      });
 
       setDepositAmount('');
       console.log('Vault funded successfully!');

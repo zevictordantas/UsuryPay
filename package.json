@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "anvil": "anvil",
+    "deploy:local": "node --env-file=contracts/.env --import tsx scripts/deploy-local.ts",
+    "wagmi:generate": "wagmi generate",
+    "wagmi:watch": "wagmi generate --watch",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -36,6 +40,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

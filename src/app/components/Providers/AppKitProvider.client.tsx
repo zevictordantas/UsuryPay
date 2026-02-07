@@ -1,10 +1,14 @@
 'use client';
 
-import { wagmiAdapter, projectId } from '@/app/WagmiConfig';
+import {
+  defaultNetwork,
+  networks,
+  wagmiAdapter,
+  projectId,
+} from '@/app/WagmiConfig';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
-import { arcTestnet } from '@reown/appkit/networks'; // @TODO change this (use env variables to divide dev from prod)
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 
 /**
@@ -31,11 +35,11 @@ const metadata = {
 };
 
 // Create the modal
-const modal = createAppKit({
+createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [arcTestnet],
-  defaultNetwork: arcTestnet,
+  networks,
+  defaultNetwork,
   metadata: metadata,
   features: {
     analytics: false, // Optional - defaults to your Cloud configuration

@@ -140,7 +140,7 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 
 ## Implementation details & constraints
 
-- **Escrow model:** seller must `safeTransferFrom(seller → marketplace, tokenId)` (or the `list()` function can require that marketplace already owns token). Both approaches acceptable; prefer requiring token already transferred for simplicity.
+- **Escrow model:** the `list()` function calls `safeTransferFrom` to transfer the token from seller to marketplace. Seller must approve marketplace before calling `list()`.
 - **Atomic purchase:** perform `USDC.transferFrom(buyer, seller, price)` and token transfer within a single transaction to ensure atomicity.
 - **ERC-1155 handling:** only whole-token sales (amount = 1). Do not support fungible amounts.
 - **USDC token behavior:** treat USDC as standard ERC-20. Be aware of possible non-compliant tokens; for demo use official USDC.
@@ -193,7 +193,7 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 
 - **Frontend Views**
   - Marketplace: Aims for buyers who will send USDC to receive EC tokens
-  - Marketplace Listing: Aims for sellers who wants to list their EC tokens and whish to recieve USDC in exchange
+  - Marketplace Listing: Aims for sellers who want to list their EC tokens and wish to receive USDC in exchange
 
 - **UX notes:** Show USDC price, prompt for approvals where needed, show transaction pending / confirmed state via events.
 
@@ -209,7 +209,7 @@ function getAllListings() external view returns (Listing[] memory); // acceptabl
 
 ---
 
-## Minimal Implementaiton
+## Minimal Implementation
 
 1. Write and compile `Marketplace.sol` with tests.
 2. Deploy to testnet / local node

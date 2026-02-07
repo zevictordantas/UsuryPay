@@ -129,6 +129,46 @@ These documents are the absolute authority. Code must reflect docs.
 - 🚧 **Frontend** - Partially implemented (using mock data)
 - ❌ **Testing** - No framework configured yet
 
+## Local Dev & Wagmi Hooks
+
+Minimal local flow (see `package.json` scripts):
+
+1. Run local chain: `pnpm anvil`
+2. Deploy contracts + write `deployments.json`: `pnpm deploy:local`
+3. Generate wagmi hooks into `src/generated.ts`: `pnpm wagmi:generate` (or `pnpm wagmi:watch`)
+4. Start app: `pnpm dev`
+
+### Wagmi Hook Development Rules
+
+**RULE**: Always use wagmi-generated hooks directly. Never create custom wrapper hooks.
+
+**Implementation**:
+
+- Import hooks directly from `@/generated`
+- For dynamic addresses: `useReadContractName({ address: dynamicAddress, args })`
+- For static addresses: `useReadContractName({ args })`
+- Never create custom wrappers around wagmi functionality
+
+**Exceptions**: Complex multi-step business logic only.
+
+Local deploy also creates `MockUSDC` and a `MockECToken` (one token minted to the deployer) for marketplace testing.
+
+## Environment-Based Chains
+
+Use `NEXT_PUBLIC_ENV` to choose the environment and default chain set:
+
+- `dev` (default): `anvil`
+- `stage`: `sepolia`
+- `prod`: `arcTestnet`
+
+Override per environment with comma-separated chain names:
+
+- `NEXT_PUBLIC_DEV_CHAINS`
+- `NEXT_PUBLIC_STAGE_CHAINS`
+- `NEXT_PUBLIC_PROD_CHAINS`
+
+Example: `NEXT_PUBLIC_DEV_CHAINS=anvil,sepolia`
+
 ## Questions?
 
 For architectural questions, refer to:

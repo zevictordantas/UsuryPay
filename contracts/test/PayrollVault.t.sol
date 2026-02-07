@@ -118,4 +118,36 @@ contract PayrollVaultTest is Test {
         assertEq(info.asset, address(usdc));
         assertEq(info.payer, employer);
     }
+
+    function testGetAllTokensOfOwner() public {
+        // Mint tokens to employee
+        vm.startPrank(employer);
+        uint256 tokenId1 = vault.mintSalaryToken(employee, 1000e6, 1);
+        uint256 tokenId2 = vault.mintSalaryToken(employee, 2000e6, 2);
+        vm.stopPrank();
+
+        // Check employee owns both
+        uint256[] memory employeeTokens = ecToken.getAllTokensOfOwner(employee);
+        assertEq(employeeTokens.length, 2);
+        assertEq(employeeTokens[0], tokenId1);
+        assertEq(employeeTokens[1], tokenId2);
+
+        // Transfer one token to employer
+        vm.prank(employee);
+        ecToken.safeTransferFrom(employee, employer, tokenId1, 1, "");
+
+        // Check updated ownership
+        employeeTokens = ecToken.getAllTokensOfOwner(employee);
+        assertEq(employeeTokens.length, 1);
+        assertEq(employeeTokens[0], tokenId2);
+
+        uint256[] memory employerTokens = ecToken.getAllTokensOfOwner(employer);
+        assertEq(employerTokens.length, 1);
+        assertEq(employerTokens[0], tokenId1);
+    }
+
+    function testGetAllTokensOfOwner_EmptyArray() public {
+        uint256[] memory tokens = ecToken.getAllTokensOfOwner(address(0x999));
+        assertEq(tokens.length, 0);
+    }
 }

@@ -103,6 +103,17 @@ docs/                       # SOURCE OF TRUTH
 └── Integrations.md         # Optional integrations
 ```
 
+## Application Views
+
+Four distinct user interfaces:
+
+- **/employer** - Vault management, token minting, credit monitoring
+- **/employee** - View salary tokens, sell to PayrollDApp
+- **/usurer** - Portfolio view (your owned EC tokens), NOT marketplace browsing
+- **/marketplace** - Browse and buy EC tokens, list tokens for sale
+
+**Key distinction:** Usurer dashboard = portfolio management. Marketplace = token trading.
+
 ## Key Terminology
 
 **Use these terms:**

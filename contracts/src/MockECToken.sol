@@ -31,6 +31,7 @@ contract MockECToken is ERC1155 {
     mapping(uint256 => TokenInfo) private _tokenInfo;
     mapping(uint256 => address) private _vaults;
     mapping(uint256 => address) private _tokenRecipients;
+    uint256[] private _allTokenIds;
 
     constructor() ERC1155("") {}
 
@@ -83,6 +84,7 @@ contract MockECToken is ERC1155 {
         returns (uint256 tokenId)
     {
         tokenId = ++_nextTokenId;
+        _allTokenIds.push(tokenId);
         _tokenInfo[tokenId] = TokenInfo({vaultId: vaultId, schedule: schedule, claimed: 0, metadata: metadata});
         _tokenRecipients[tokenId] = recipient; // Store original recipient
         _mint(recipient, tokenId, 1, "");
@@ -104,5 +106,36 @@ contract MockECToken is ERC1155 {
         require(_vaults[_tokenInfo[tokenId].vaultId] == msg.sender, "Only vault can update claimed");
         _tokenInfo[tokenId].claimed += amount;
         emit Claimed(tokenId, amount, _tokenInfo[tokenId].claimed);
+    }
+
+    /**
+     * @notice Get all token IDs owned by an address
+     * @dev MVP: Simple iteration. May fail with many tokens.
+     * @param owner Address to query
+     * @return Array of token IDs where balanceOf(owner, tokenId) > 0
+     */
+    function getAllTokensOfOwner(address owner) external view returns (uint256[] memory) {
+        uint256 ownedCount = 0;
+
+        // Count owned tokens
+        for (uint256 i = 0; i < _allTokenIds.length; i++) {
+            if (balanceOf(owner, _allTokenIds[i]) > 0) {
+                ownedCount++;
+            }
+        }
+
+        // Build result array
+        uint256[] memory ownedTokenIds = new uint256[](ownedCount);
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < _allTokenIds.length; i++) {
+            uint256 tokenId = _allTokenIds[i];
+            if (balanceOf(owner, tokenId) > 0) {
+                ownedTokenIds[currentIndex] = tokenId;
+                currentIndex++;
+            }
+        }
+
+        return ownedTokenIds;
     }
 }

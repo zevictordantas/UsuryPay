@@ -242,3 +242,33 @@ The `./docs/` directory is the **source of truth**. All code must match specific
 - Usurer is the UI display name for investors. Investors are people how buy EC tokens
 
 **Always reference docs when implementing features to ensure accuracy.**
+
+### Application Views
+
+UsuryPay has four distinct views, each serving a different user role:
+
+1. **Employer Dashboard** (`/employer`)
+   - Manage PayrollVault
+   - Fund escrow with USDC
+   - Mint EC tokens for employees (salary payments)
+   - Monitor credit score and funding status
+
+2. **Employee Dashboard** (`/employee`)
+   - View salary EC tokens received from employer
+   - Sell tokens to PayrollDApp for immediate cash (factoring)
+   - Track token vesting and claims
+
+3. **Usurer Dashboard** (`/usurer`)
+   - **Portfolio view** - shows EC tokens you own (from any source)
+   - Monitor token performance (total value, remaining claims)
+   - View tokens listed vs not listed on marketplace
+   - Link to list tokens for sale
+   - **NOT for browsing/buying tokens** - see Marketplace for that
+
+4. **Marketplace** (`/marketplace`)
+   - Browse EC tokens available for purchase
+   - Buy tokens from other users with USDC
+   - Filter and sort by discount, credit score, duration
+   - List your own tokens for sale (`/marketplace/list`)
+
+**Important:** Usurer dashboard is for managing your portfolio, not for buying tokens. Marketplace is for trading.

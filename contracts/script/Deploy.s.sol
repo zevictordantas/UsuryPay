@@ -18,13 +18,11 @@ contract Deploy is Script {
         Marketplace marketplace;
         PayrollVaultFactory vaultFactory;
         PayrollDApp payrollDApp;
-        address treasuryAddress;
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
         if (block.chainid == 31337) {
             vm.startBroadcast(deployerPrivateKey);
             usdc = address(new MockUSDC());
-            treasuryAddress = msg.sender;
 
             // Fund all anvil accounts with USDC (Play in fronted on local dev enviroment)
             address[] memory wallets = vm.getWallets();
@@ -33,7 +31,6 @@ contract Deploy is Script {
             }
         } else {
             usdc = vm.envAddress("USDC_ADDRESS");
-            treasuryAddress = vm.envAddress("TREASURY_ADDRESS");
             vm.startBroadcast();
         }
 
@@ -46,8 +43,8 @@ contract Deploy is Script {
         vaultFactory = new PayrollVaultFactory(address(ecToken), usdc);
         console.log("PayrollVaultFactory deployed at:", address(vaultFactory));
 
-        // Deploy PayrollDApp
-        payrollDApp = new PayrollDApp(usdc, address(ecToken), treasuryAddress);
+        // Deploy PayrollDApp (with 25% resale profit margin: buy at 60%, sell at 75%)
+        payrollDApp = new PayrollDApp(usdc, address(ecToken), address(marketplace), 2500);
         console.log("PayrollDApp deployed at:", address(payrollDApp));
 
         if (block.chainid == 31337) {
@@ -55,9 +52,9 @@ contract Deploy is Script {
             (uint256 vaultId, address testVault) = vaultFactory.createVault();
             console.log("Test vault created at:", testVault, "with ID:", vaultId);
 
-            // Fund treasury with USDC for buying tokens
-            MockUSDC(usdc).mint(treasuryAddress, 100_000e6);
-            console.log("Treasury funded with 100,000 USDC");
+            // Fund PayrollDApp with USDC for buying tokens from employees
+            MockUSDC(usdc).mint(address(payrollDApp), 1_000_000e6); // 1M USDC
+            console.log("PayrollDApp funded with 1,000,000 USDC");
 
             // Mint test token
             uint256 startTime = block.timestamp - 1 days;

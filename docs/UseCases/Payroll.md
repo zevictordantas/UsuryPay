@@ -62,20 +62,21 @@ The payroll dApp uses the Expected Cashflow primitive to enable employees to **s
             ┌──────────────────────────────────────┐
             │        Payroll dApp                  │
             │  ┌────────────────────────────────┐  │
-            │  │ 1. Assess EC token value       │  │
-            │  │ 2. Calculate discount          │  │
-            │  │ 3. Make offer: $44k for $48k EC│  │
+            │  │ Frontend preview:              │  │
+            │  │ • getECTokenValue() → $44k     │  │
+            │  │                                │  │
+            │  │ Employee calls sellToken():    │  │
+            │  │ 1. Calculate offer ($44k)      │  │
+            │  │ 2. Transfer EC to dApp         │  │
+            │  │ 3. Transfer cash to employee   │  │
             │  └────────────────────────────────┘  │
-            │                                       │
-            │  Employee accepts ────────────────────┼──┐
-            └───────────────────────────────────────┘  │
-                                                       │
-                                                       ▼
+            └───────────────────────┬──────────────┘
+                                    │
+                                    ▼
                     ┌──────────────────────────────────────┐
-                    │  Transfer Flow                       │
-                    │  • Employee transfers EC to dApp     │
-                    │  • dApp transfers $44k to employee   │
-                    │  • dApp now owns EC token            │
+                    │  Result (single transaction)         │
+                    │  • Employee got $44k immediately     │
+                    │  • dApp owns EC token                │
                     │  • dApp claims $48k over 12 months   │
                     │  • dApp profit: $4k (~9% return)     │
                     └──────────────────────────────────────┘
@@ -117,15 +118,6 @@ contract PayrollDApp {
     IERC20 public paymentToken; // e.g., USDC
     address public treasury;
 
-    struct PurchaseOffer {
-        uint256 tokenId;
-        uint256 offerAmount;      // What dApp will pay NOW
-        uint256 futureValue;      // What EC token will pay out
-        uint256 expiresAt;
-        bool isActive;
-    }
-
-    mapping(bytes32 => PurchaseOffer) public offers;
     mapping(uint256 => bool) public ownedTokens;
 
     // View functions (no indexer needed)
@@ -137,12 +129,7 @@ contract PayrollDApp {
     );
 
     // State-changing functions
-    function requestQuote(uint256 tokenId) external returns (
-        bytes32 offerHash,
-        uint256 offerAmount,
-        uint256 expiresAt
-    );
-    function acceptOffer(bytes32 offerHash) external;
+    function sellToken(uint256 tokenId) external returns (uint256 offerAmount);
     function claimFromToken(uint256 tokenId) external;
 }
 ```
@@ -159,14 +146,16 @@ contract PayrollDApp {
 
 ### Flow 2: Employee Sells EC Token (Get Paid Early)
 
-1. Employee requests quote: `dApp.requestQuote(tokenId)`
-2. PayrollDApp assesses:
-   - Check vault credit score
-   - Check time remaining
-   - Calculate offer based on risk
-3. PayrollDApp creates offer (expires in 24 hours)
-4. Employee accepts: `dApp.acceptOffer(offerHash)`
-5. Atomic transfer:
+**Frontend Preview (before transaction):**
+1. Employee views token in UI
+2. Frontend calls `dApp.getECTokenValue(tokenId)` to preview offer
+3. UI displays: "Get $43,776 now (future value: $48,000)"
+
+**On-Chain Transaction (single step):**
+1. Employee approves token: `ecToken.approve(dApp.address, tokenId)`
+2. Employee sells token: `dApp.sellToken(tokenId)`
+3. PayrollDApp calculates offer on-chain (same formula as view function)
+4. Atomic transfer:
    - EC token: Employee → PayrollDApp
    - Cash: PayrollDApp → Employee
 
@@ -174,6 +163,8 @@ contract PayrollDApp {
 - Employee has cash immediately
 - PayrollDApp owns EC token
 - PayrollDApp will collect full amount over time from vault
+
+**Key simplification:** No two-step quote/accept flow. Quote is calculated on frontend using view function, then executed atomically in single transaction.
 
 ### Flow 3: PayrollDApp Claims Funds
 
@@ -251,29 +242,30 @@ Scenario 2: Risky employer, long term
 
 ### For Employees
 
-**View EC Tokens:**
+**View EC Tokens and Preview Offer:**
 ```typescript
 const tokens = await ecToken.tokensOfOwner(userAddress);
 for (const tokenId of tokens) {
   const info = await ecToken.getTokenInfo(tokenId);
   const { currentValue, futureValue, discountedValue } =
     await payrollDApp.getECTokenValue(tokenId);
-  // Display: "Sell now for: $38,988"
+  // Display: "Sell now for: $43,776" (preview calculated off-chain)
 }
 ```
 
-**Request Quote:**
+**Sell Token (Single Transaction):**
 ```typescript
-const tx = await payrollDApp.requestQuote(tokenId);
-const receipt = await tx.wait();
-const event = receipt.events.find((e) => e.event === 'QuoteCreated');
-const { offerHash, offerAmount, expiresAt } = event.args;
-```
-
-**Accept Offer:**
-```typescript
+// 1. Approve token transfer
 await ecToken.approve(payrollDApp.address, tokenId);
-await payrollDApp.acceptOffer(offerHash);
+
+// 2. Sell token (calculates offer on-chain and executes atomically)
+const tx = await payrollDApp.sellToken(tokenId);
+const receipt = await tx.wait();
+
+// Extract offer amount from events if needed
+const event = receipt.events.find((e) => e.event === 'TokenPurchased');
+const { tokenId, seller, offerAmount } = event.args;
+// Employee received offerAmount of USDC
 ```
 
 ### For Employers

@@ -1,24 +1,25 @@
 # Expected Cashflow (EC) Primitive
 
-**The EC primitive is the core innovation of this project.** It enables tokenization and trading of future payment streams that carry default risk.
+**The EC primitive is the core innovation of this project.** It enables tokenization and trading of future payment streams that could carry risk.
 
 Unlike yield-bearing assets with guaranteed returns (e.g., Pendle), EC tokens represent _expected_ but _not guaranteed_ cashflows.
 
 ## Core Use Cases
 
+- Micro-payments for affiliates (B2B2C like uber, ifood, airbnb)
+- Subscription revenues (B2B like stripe)
 - Salary payments (employer → employee)
 - Rental agreements (tenant → landlord)
-- Subscription revenues
 - Installment payments
 - Stock dividends and fixed-rate instruments
 - Commodity enterprise contractual offtake
 
 ## Architecture
 
-The primitive consists of two components:
+The primitive works with at least two components:
 
-1. **ECVault** — escrow contract where payer deposits funds
-2. **ECToken** — ERC-1155 representing the right to claim from the vault (For the MVP we wont allow fractionalization)
+1. **ECVaults** — escrow contract where payer deposits funds. There can be another ECVault, as third component, where payments received by the ECToken remains, could be a liquidity pool, even to ease discount of future cash flows.
+2. **ECToken** — ERC-1155 representing the right to claim from the vault. For the MVP we wont allow fractionalization, but you could tokenize the whole cashflow and an sell only a fraction of it, leaving a bit for yourself and this would improve risk of default.
 
 ```
 ┌─────────────────┐
@@ -82,7 +83,6 @@ Records default events with:
 ### Simplicity First
 
 - Linear accrual model (like Pendle's rate-per-second)
-- Pro-rata distribution on partial funding
 - No off-chain attestations or legal enforcement
 - No token splitting (transfer whole token only)
 
@@ -140,9 +140,12 @@ interface IECVault {
     function checkSolvency() external view returns (bool isSolvent, uint256 shortfall);
 
     // State-Changing Functions
-    function fund(uint256 amount) external payable;
+    /// @notice Fund vault with ERC20 asset (requires prior approval)
+    function fund(uint256 amount) external;
     function claim(uint256 tokenId, uint256 amount) external returns (uint256 claimed, bool defaultOccurred);
+    /// @notice Amend a recorded default (callable by payer or governance)
     function amendDefault(uint256 tokenId, uint256 defaultIndex, bytes calldata settlementData) external;
+    /// @notice Hook called when default is detected (internal or by keeper)
     function onDefaultDetected(uint256 tokenId, uint256 shortfall) external;
 }
 ```
@@ -169,14 +172,14 @@ interface IECToken is IERC1155 {
     }
 
     struct TokenInfo {
-        uint256 vaultId;
+        address vault;
         PaymentSchedule schedule;
         uint256 claimed;
         bytes metadata;
     }
 
     // Events
-    event TokenMinted(uint256 indexed tokenId, uint256 indexed vaultId, address indexed recipient);
+    event TokenMinted(uint256 indexed tokenId, address indexed vault, address indexed recipient);
     event Claimed(uint256 indexed tokenId, uint256 amount, uint256 newClaimedTotal);
 
     // View Functions
@@ -185,11 +188,13 @@ interface IECToken is IERC1155 {
     function getClaimable(uint256 tokenId) external view returns (uint256 claimable);
     function getEffectiveClaimable(uint256 tokenId) external view returns (uint256 effectiveClaimable, uint256 shortfall);
     function getVault(uint256 tokenId) external view returns (address vault);
+    /// @notice Get all token IDs owned by an address (for enumeration)
+    function tokensOfOwner(address owner) external view returns (uint256[] memory tokenIds);
 
     // State-Changing Functions
     function mint(
         address recipient,
-        uint256 vaultId,
+        address vault,
         PaymentSchedule calldata schedule,
         bytes calldata metadata
     ) external returns (uint256 tokenId);
@@ -357,7 +362,7 @@ contract SalaryToken is IECToken {
 - ✅ Linear accrual by default (no complex schedules in MVP)
 - ✅ Pro-rata distribution (no priority mechanisms)
 - ✅ No automatic distributions (user-triggered only)
-- ✅ No token splitting (ERC-1155, not ERC-1155)
+- ✅ No token splitting (whole token transfer only via ERC-1155)
 - ✅ No off-chain dependencies
 - ✅ Minimal governance (minting auth only)
 

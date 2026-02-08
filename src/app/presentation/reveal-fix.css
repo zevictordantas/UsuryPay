@@ -1,0 +1,11 @@
+@layer base {
+  /* Reverts a preflight rule on hidden that breaks some reveal.js */
+  [hidden] {
+    display: revert !important;
+  }
+}
+
+/* 
+  This is an issue where Tailwind v4 breaks Revealjs transitions.
+  For more info on this fix: https://github.com/hakimel/reveal.js/issues/3782
+*/

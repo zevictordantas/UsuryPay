@@ -4,6 +4,8 @@ import Reveal from 'reveal.js';
 import './reveal-fix.css';
 import 'reveal.js/dist/reveal.css';
 import 'reveal.js/dist/theme/simple.css';
+import chart from './UsuryPayChart.svg';
+import Image from 'next/image';
 
 export default function PresentationPage() {
   const deckDivRef = useRef<HTMLDivElement>(null); // reference to deck container div
@@ -38,58 +40,113 @@ export default function PresentationPage() {
   return (
     <div className="reveal transition-all" ref={deckDivRef}>
       <div className="slides">
-        {/* ── Title ── */}
         <section>
-          <h2 className="font-semibold!">Usury Protocol</h2>
-          <p className="text-xl opacity-75">
-            A DeFi Primitive for Expected Cashflows
-          </p>
+          {/* ── Title ── */}
+          <section>
+            <h2 className="font-semibold!">Usury Protocol</h2>
+            <p className="text-xl opacity-75">Expected Cashflows Tokenized</p>
+          </section>
+          {/* ── Payroll & Marketplace ── */}
+          <section>
+            <p className="mt-4 text-base opacity-50">Our hackathon demo:</p>
+            <h3 className="font-semibold!">Usury Pay & Usury Market</h3>
+            <p className="mt-4 text-xl">
+              <strong>Usury Pay:</strong>
+              <br />A Payroll dApp that gives <i>you</i> the benefit of usury
+            </p>
+            <p className="mt-2! mb-1! text-base opacity-75">
+              Provide instant liquidity to employees buying their EC Tokens
+              (unlike other platforms)
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Bought EC Tokens accrue value over time making the business
+              profitable
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Selling tokens to investors is also profitable: Keeps the app
+              treasury with liquidity and mitigates risk
+            </p>
+
+            <p className="mt-4 text-xl">
+              <strong>Usury Market:</strong>
+              <br />A Marketplace that makes usury accessible{' '}
+              <i>for everyone</i>
+            </p>
+            <p className="mt-3! mb-1! text-base opacity-75">
+              Market signals how interest-rate should adjust
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Supply and demand discover real risk pricing
+            </p>
+            <p className="my-1! text-base opacity-75">
+              P2P trading offers transparency and better offers
+            </p>
+          </section>
         </section>
 
         {/* ── The Primitive ── */}
         <section>
-          <h4 className="font-semibold!">
-            The Primitive consist of two components:
-          </h4>
-          <ul className="mt-6 text-left text-xl!">
-            <li className="mt-3">
-              💰 <strong>ECVault:</strong> Where the <b>payer</b> deposits
-              funds. It tracks defaults & solvency
-            </li>
-            <li className="mt-3">
-              💸 <strong>ECToken (ERC-1155):</strong> Represents entitlement to
-              claim future payments from the vault.
-            </li>
-          </ul>
-          <p className="mt-8 text-sm opacity-50">
-            <em>
-              Yield is not guaranteed, the primitive carry default risk — and
-              that&apos;s the point.
-            </em>
-            <br />
-            <br />
-            Solvent vaults represnet creditworthyness. 🏦
-            <br />
-            Risky EC Tokens can be bought at great discounts. 🤑
-          </p>
+          <section>
+            <p className="mt-4 text-base opacity-50">
+              The core of our project:
+            </p>
+
+            <h4 className="font-semibold!">
+              A Primitive for Expected Cashflows
+            </h4>
+
+            <p className="mt-4 text-base italic opacity-50">
+              A DeFi protocol that enables Usury on-chain
+            </p>
+          </section>
+          <section>
+            <h4 className="font-semibold!">
+              The primitive consist of two components:
+            </h4>
+            <ul className="mt-6 text-left text-lg!">
+              <li className="mt-3">
+                💰 <strong>ECVault</strong> where the payer is <b>expected</b>{' '}
+                to deposit funds in the future; tracks solvency and defaults.
+              </li>
+              <li className="mt-3">
+                💸 <strong>ECToken (ERC-1155)</strong> that gives entitlement
+                and allowance to claim <b>future cashflows</b> from the vault.
+              </li>
+            </ul>
+            <p className="mt-6 text-sm opacity-50">
+              <em>
+                Yield is not guaranteed, the primitive carry default risk — and
+                that&apos;s the point.
+              </em>
+              <br />
+              <span className="text-xs italic">
+                Solvent vaults represnet creditworthyness. 🏦
+              </span>
+              <br />
+              <span className="text-xs italic">
+                Risky EC Tokens can be bought at great discounts. 🤑
+              </span>
+            </p>
+            <Image src={chart} />
+          </section>
         </section>
 
         {/* ── Default Risk = Incentive Engine ── */}
         <section>
           <section>
-            <h3 className="font-semibold!">Risk of Default is the Feature</h3>
+            <h3 className="font-semibold!">On-Chain Reputation</h3>
             <p className="mt-4 text-xl!">
-              Because default exists, both sides are{' '}
-              <strong>
-                incentivized to operate on-chain to minimize trust.
-              </strong>
+              Because default risk exists, both sides are{' '}
+              <strong>incentivized to operate on-chain.</strong>
             </p>
             <p className="mt-8 text-sm italic opacity-50">
-              (the economy of the future is on-chain)
+              (On-chain data means minimized trust.)
             </p>
-            <p className="mt-2 text-5xl font-bold opacity-60">👇</p>
           </section>
           <section>
+            <p className="mt-4 text-sm italic opacity-50">
+              Payers a.k.a: the source of future cashflows
+            </p>
             <h4 className="text-xl font-semibold!">
               Payers want to be trusted
             </h4>
@@ -111,6 +168,10 @@ export default function PresentationPage() {
             </ul>
           </section>
           <section>
+            <p className="mt-4 text-sm italic opacity-50">
+              Investors a.k.a: Usurers, the source of instant liquidity seeking
+              future profit
+            </p>
             <h4 className="text-xl font-semibold!">
               Investors need to assess risk
             </h4>
@@ -143,13 +204,13 @@ export default function PresentationPage() {
                 <span className="italic opacity-50">— on-chain </span>
               </li>
               <li className="mt-2">
-                Funding history{' '}
+                Payment history{' '}
                 <span className="italic opacity-50">— on-chain </span>
               </li>
             </ul>
-            <p className="mt-6 text-sm italic opacity-50">
+            {/* <p className="mt-6 text-sm italic opacity-50">
               Makes them verifiable & composable.
-            </p>
+            </p> */}
           </section>
         </section>
 
@@ -186,6 +247,11 @@ export default function PresentationPage() {
                 returns (aTokens, stETH). No default risk.
               </li>
               <li className="mt-3">
+                <strong>Sablier & Superfluid</strong> — Token streaming
+                protocols with real-time payment flows. Require upfront capital
+                locked in streams. No default risk (funds already deposited).
+              </li>
+              <li className="mt-3">
                 <strong>Aave & Morpho</strong> — Overcollateralized lending
                 protocols. No default risk for lenders (liquidations protect
                 capital).
@@ -216,42 +282,6 @@ export default function PresentationPage() {
               </em>
             </p>
           </section>
-        </section>
-
-        {/* ── Payroll & Marketplace ── */}
-        <section>
-          <p className="mt-4 text-base opacity-50">Our hackathon demo:</p>
-          <h3 className="font-semibold!">Usury Pay & Usury Market</h3>
-          <p className="mt-4 text-xl">
-            <strong>Usury Pay:</strong>
-            <br />A Payroll dApp that gives <i>you</i> the benefit of usury
-          </p>
-          <p className="mt-2! mb-1! text-base opacity-75">
-            Provide instant liquidity to employees buying their EC Tokens
-            (unlike other platforms)
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Bought EC Tokens accrue value over time making the business
-            profitable
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Selling tokens to investors is also profitable: Keeps the app
-            treasury with liquidity and mitigates risk
-          </p>
-
-          <p className="mt-4 text-xl">
-            <strong>Usury Market:</strong>
-            <br />A Marketplace that makes usury accessible <i>for everyone</i>
-          </p>
-          <p className="mt-3! mb-1! text-base opacity-75">
-            Market signals how interest-rate should adjust
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Supply and demand discover real risk pricing
-          </p>
-          <p className="my-1! text-base opacity-75">
-            P2P trading offers transparency and better offers
-          </p>
         </section>
       </div>
     </div>

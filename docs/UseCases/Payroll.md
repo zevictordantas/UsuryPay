@@ -90,14 +90,25 @@ Extended vault that allows employer to mint EC tokens directly.
 
 ```solidity
 contract PayrollVault is IECVault {
-    // Employer (vault owner) can mint EC tokens
+    IECToken public ecToken;
+
+    /// @notice Mint salary EC token for employee
+    /// @dev Internally calls ecToken.mint() with computed PaymentSchedule
     function mintSalaryToken(
         address employee,
         uint256 monthlyAmount,
         uint256 durationMonths
-    ) external onlyEmployer returns (uint256 tokenId);
+    ) external onlyEmployer returns (uint256 tokenId) {
+        PaymentSchedule memory schedule = PaymentSchedule({
+            totalAmount: monthlyAmount * durationMonths,
+            startTime: block.timestamp,
+            endTime: block.timestamp + (durationMonths * 30 days),
+            ratePerSecond: (monthlyAmount * durationMonths) / (durationMonths * 30 days),
+            customParams: ""
+        });
+        return ecToken.mint(employee, address(this), schedule, "");
+    }
 
-    // View function: calculate employer's credit score
     function getEmployerCreditScore() external view returns (uint256 score);
 }
 ```

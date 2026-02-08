@@ -1,0 +1,9 @@
+{
+  "chainId": 11155111,
+  "MockECToken": "0x5f831b8c021c0c2a8fe471bd8ed76eb675462571",
+  "Marketplace": "0x4ed7bd530a763f243ba45f0e2d470148858c05b3",
+  "PayrollVaultFactory": "0x17cd72a6119be4e775479cb755a8cf4b79a0f895",
+  "PayrollDApp": "0xd3a836ecfd6cbb32203023045fb4a0a97b4b151d",
+  "PayrollVaultCCTP": "0xadfcd25a5605d18c2121d00e964b9b1e0ab5b48a",
+  "USDC": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+}

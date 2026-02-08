@@ -47,11 +47,14 @@ A simple marketplace frontend for buying and selling EC tokens.
 
 ### 4. [Integrations.md](./Integrations.md) - **OPTIONAL ENHANCEMENTS**
 
-External protocol integrations (NOT required for MVP):
+Layered integration architecture:
 
-- **ENS** - Human-readable identity and metadata (low effort, high value)
-- **Arc/Circle** - Chain-agnostic USDC routing (optional)
-- **Yellow Network** - Off-chain micropayments (future work)
+- **ECVault** - Trustless on-chain custody (CORE)
+- **Yellow Network** - Off-chain micropayment channels (settles to ECVault)
+- **Arc/Circle** - Cross-chain USDC routing only (not custody)
+- **ENS** - Human-readable identity (low effort, high value)
+
+**Deployment:** Sepolia for MVP. See Integrations.md for details.
 
 ## Application Structure
 
@@ -169,15 +172,4 @@ Override per environment with comma-separated chain names:
 
 Example: `NEXT_PUBLIC_DEV_CHAINS=anvil,sepolia`
 
-## Questions?
 
-For architectural questions, refer to:
-
-- Primitive.md:322-442 (Design rationale)
-- UseCases/Payroll.md:17-32 (What is/isn't a loan)
-- Integrations.md:47-66 (Integration priority)
-
-For implementation details, refer to:
-
-- Primitive.md:91-280 (Solidity interfaces)
-- UseCases/Payroll.md:81-139 (Contract components)

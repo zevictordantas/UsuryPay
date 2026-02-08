@@ -41,8 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# wagmi generated (regenerated on deploy)
-src/generated.ts
+# Local anvil deployments (regenerated on local deploy)
 deployments.json
 
 # Foundry

@@ -3,11 +3,19 @@ import { writeFileSync } from 'fs';
 
 if (!process.env.PRIVATE_KEY) throw new Error('PRIVATE_KEY not set');
 
+// Anvil
 const NETWORK = {
   chainId: '31337',
   rpcUrl: process.env.RPC_URL || 'http://localhost:8545',
   privateKey: process.env.PRIVATE_KEY,
 } as const;
+
+// Sepolia fork in anvil (commented out - using plain Anvil)
+// const NETWORK = {
+//   chainId: '11155111',
+//   rpcUrl: process.env.RPC_URL || 'http://localhost:8545',
+//   privateKey: process.env.PRIVATE_KEY,
+// } as const;
 
 const DEPLOY_SCRIPT = 'Deploy.s.sol';
 const CONTRACTS = [

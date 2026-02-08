@@ -1,4 +1,4 @@
-import { createStorage, cookieStorage } from 'wagmi';
+import { createStorage, cookieStorage, http } from 'wagmi';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import {
   anvil,
@@ -22,6 +22,9 @@ export const wagmiAdapter = new WagmiAdapter({
   ssr: true,
   projectId,
   networks,
+  transports: {
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC as string),
+  },
 });
 
 export const config = wagmiAdapter.wagmiConfig;

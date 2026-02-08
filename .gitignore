@@ -41,9 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# wagmi generated (regenerated on deploy)
-src/generated.ts
-deployments.json
+# Note: deployments.json is tracked with placeholder addresses for builds
+# Local deploys update it but those changes shouldn't be committed
 
 # Foundry
 contracts/cache/

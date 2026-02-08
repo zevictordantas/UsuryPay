@@ -76,12 +76,12 @@ export function PayrollSummaryCard() {
 
   if (!employeeAddress) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Payroll Summary
         </h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">Connect wallet to view summary</p>
+          <p className="text-zinc-500">Connect wallet to view summary</p>
         </div>
       </div>
     );
@@ -89,36 +89,36 @@ export function PayrollSummaryCard() {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Payroll Summary
         </h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">Loading...</p>
+          <p className="text-zinc-500">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-semibold text-zinc-900">
         Payroll Summary
       </h2>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <p className="text-sm text-gray-600">Total Claimable Now</p>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-sm text-zinc-600">Total Claimable Now</p>
+          <p className="text-3xl font-bold text-emerald-600">
             ${totalClaimable.toFixed(2)}
           </p>
-          <p className="text-xs text-gray-500">Across all owned EC tokens</p>
+          <p className="text-xs text-zinc-500">Across all owned EC tokens</p>
         </div>
 
         <div>
-          <p className="text-sm text-gray-600">Active Salary Tokens</p>
-          <p className="text-3xl font-bold text-gray-900">{tokenCount}</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm text-zinc-600">Active Salary Tokens</p>
+          <p className="text-3xl font-bold text-zinc-900">{tokenCount}</p>
+          <p className="text-xs text-zinc-500">
             {tokenCount === 0
               ? 'No tokens yet'
               : tokenCount === 1
@@ -129,7 +129,7 @@ export function PayrollSummaryCard() {
       </div>
 
       {tokenCount === 0 && (
-        <div className="mt-4 rounded-md bg-blue-50 p-4 text-sm text-blue-700">
+        <div className="mt-4 rounded-md bg-zinc-100 p-4 text-sm text-zinc-700">
           <p className="font-medium">How it works:</p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             <li>Your employer mints salary tokens for you</li>

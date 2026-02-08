@@ -13,6 +13,7 @@ import {
   mockEcTokenAbi,
 } from '@/generated';
 import { addresses } from '@/contracts/addresses';
+import { useToast } from '@/app/components/Toast/ToastContext';
 
 interface ECTokenSaleCardProps {
   onSuccess?: () => void;
@@ -27,6 +28,7 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   const contractAddresses = addresses[chainId as keyof typeof addresses];
   const ecTokenAddress = contractAddresses?.mockECToken;
   const dappAddress = contractAddresses?.payrollDApp;
+  const { showToast } = useToast();
 
   const [ownedTokenIds, setOwnedTokenIds] = useState<bigint[]>([]);
   const [isScanning, setIsScanning] = useState(true);
@@ -91,10 +93,10 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
         args: [dappAddress, true],
       });
       setIsApproved(true);
-      alert('Approval successful! Now you can sell your token.');
+      showToast('Approval successful! Now you can sell your token.', 'success');
     } catch (error) {
       console.error('Approval failed:', error);
-      alert('Approval failed. Check console for details.');
+      showToast('Approval failed. Check console for details.', 'error');
     }
   };
 
@@ -107,13 +109,13 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
         args: [selectedTokenIdBigInt],
       });
 
-      alert('Token sold successfully! USDC has been transferred to your wallet.');
+      showToast('Token sold successfully! USDC has been transferred to your wallet.', 'success');
       setSelectedTokenId('');
       setIsApproved(false);
       onSuccess?.();
     } catch (error) {
       console.error('Token sale failed:', error);
-      alert('Transaction failed. Check console for details.');
+      showToast('Transaction failed. Check console for details.', 'error');
     }
   };
 
@@ -130,10 +132,10 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
   if (!employeeAddress) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">Sell EC Token</h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">Connect wallet to sell your tokens</p>
+          <p className="text-zinc-500">Connect wallet to sell your tokens</p>
         </div>
       </div>
     );
@@ -141,10 +143,10 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
   if (isScanning) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">Sell EC Token</h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">Loading your EC tokens...</p>
+          <p className="text-zinc-500">Loading your EC tokens...</p>
         </div>
       </div>
     );
@@ -152,11 +154,11 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
   if (ownedTokenIds.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">Sell EC Token</h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">You don't own any EC tokens yet</p>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="text-zinc-500">You don't own any EC tokens yet</p>
+          <p className="mt-2 text-sm text-zinc-400">
             EC tokens are minted by your employer when they set up payroll
           </p>
         </div>
@@ -180,12 +182,12 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   const isLoading = isApproving || isSellingToken;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-semibold text-zinc-900">Sell EC Token</h2>
 
       <div className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-1 block text-sm font-medium text-zinc-700">
             Select EC Token to Sell
           </label>
           <select
@@ -194,7 +196,7 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
               setSelectedTokenId(e.target.value);
               setIsApproved(false);
             }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
             disabled={isLoading}
           >
             <option value="">Choose a token...</option>
@@ -208,9 +210,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
         {selectedToken && (
           <>
-            <div className="rounded-md bg-gray-50 p-4">
-              <h4 className="text-sm font-medium text-gray-900">Token Details</h4>
-              <div className="mt-2 space-y-1 text-sm text-gray-700">
+            <div className="rounded-md bg-zinc-50 p-4">
+              <h4 className="text-sm font-medium text-zinc-900">Token Details</h4>
+              <div className="mt-2 space-y-1 text-sm text-zinc-700">
                 <div className="flex justify-between">
                   <span>Token ID:</span>
                   <span className="font-mono">{formatTokenId(selectedTokenId)}</span>
@@ -225,7 +227,7 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Remaining Value:</span>
-                  <span className="font-medium text-green-600">${remaining.toFixed(2)}</span>
+                  <span className="font-medium text-emerald-600">${remaining.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -248,36 +250,36 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
             {dappHasBalance && futureValueUSD > 0 && (
               <>
-                <div className="rounded-md border-2 border-green-500 bg-green-50 p-4">
-                  <h4 className="mb-2 text-sm font-medium text-green-900">
+                <div className="rounded-md border-2 border-emerald-500 bg-emerald-50 p-4">
+                  <h4 className="mb-2 text-sm font-medium text-emerald-900">
                     Instant Cash Offer
                   </h4>
                   <div className="rounded-md bg-white p-4">
-                    <p className="text-center text-lg font-bold text-gray-900">
+                    <p className="text-center text-lg font-bold text-zinc-900">
                       Sell ${futureValueUSD.toFixed(2)} EC Token
                     </p>
-                    <p className="text-center text-3xl font-bold text-green-600">
+                    <p className="text-center text-3xl font-bold text-emerald-600">
                       for ${discountedValueUSD.toFixed(2)} USDC
                     </p>
-                    <p className="mt-1 text-center text-sm text-gray-600">
+                    <p className="mt-1 text-center text-sm text-zinc-600">
                       ({discountPercent.toFixed(1)}% discount)
                     </p>
                   </div>
-                  <div className="mt-3 space-y-1 text-xs text-green-700">
+                  <div className="mt-3 space-y-1 text-xs text-emerald-700">
                     <div className="flex justify-between">
                       <span>Future Value:</span>
                       <span className="font-medium">${futureValueUSD.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>You Receive Now:</span>
-                      <span className="font-bold text-green-900">${discountedValueUSD.toFixed(2)}</span>
+                      <span className="font-bold text-emerald-900">${discountedValueUSD.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-md bg-blue-50 p-4">
-                  <h4 className="text-sm font-medium text-blue-900">How It Works</h4>
-                  <ul className="mt-2 space-y-1 text-sm text-blue-700">
+                <div className="rounded-md bg-zinc-100 p-4">
+                  <h4 className="text-sm font-medium text-zinc-900">How It Works</h4>
+                  <ul className="mt-2 space-y-1 text-sm text-zinc-700">
                     <li>• This is an ASSET SALE, not a loan</li>
                     <li>• Single transaction - approve & sell</li>
                     <li>• USDC transfers to you immediately</li>
@@ -290,7 +292,7 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                   <button
                     onClick={handleApprove}
                     disabled={isLoading || !dappHasBalance}
-                    className="w-full rounded-md bg-black px-4 py-2 font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    className="w-full rounded-md bg-black px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
                   >
                     {isApproving ? 'Approving...' : 'Step 1: Approve PayrollDApp'}
                   </button>
@@ -298,7 +300,7 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                   <button
                     onClick={handleSellToken}
                     disabled={isLoading || !dappHasBalance}
-                    className="w-full rounded-md bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    className="w-full rounded-md bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-zinc-400"
                   >
                     {isSellingToken ? 'Selling...' : `Step 2: Sell Token for $${discountedValueUSD.toFixed(2)}`}
                   </button>

@@ -22,35 +22,35 @@ export function OwnedECTokensCard() {
 
   if (!address) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your EC Tokens
         </h2>
-        <p className="text-gray-500">Connect wallet to view your tokens</p>
+        <p className="text-zinc-500">Connect wallet to view your tokens</p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your EC Tokens
         </h2>
-        <p className="text-gray-500">Loading your tokens...</p>
+        <p className="text-zinc-500">Loading your tokens...</p>
       </div>
     );
   }
 
   if (!ownedTokenIds || ownedTokenIds.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your EC Tokens
         </h2>
-        <p className="text-gray-500">
+        <p className="text-zinc-500">
           You don&apos;t own any EC tokens yet.{' '}
-          <a href="/marketplace" className="text-blue-600 hover:underline">
+          <a href="/marketplace" className="text-zinc-600 hover:underline">
             Browse marketplace
           </a>
         </p>
@@ -69,14 +69,14 @@ export function OwnedECTokensCard() {
   const listed = ownedTokenIds.filter((id) => listedTokenIds.has(id));
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-zinc-900">
           Your EC Tokens
         </h2>
         <a
           href="/marketplace/list"
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-zinc-600 hover:underline"
         >
           List Token for Sale
         </a>
@@ -84,7 +84,7 @@ export function OwnedECTokensCard() {
 
       {notListed.length > 0 && (
         <section className="mb-6">
-          <h3 className="mb-3 text-sm font-medium text-gray-700">
+          <h3 className="mb-3 text-sm font-medium text-zinc-700">
             Portfolio ({notListed.length})
           </h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -97,7 +97,7 @@ export function OwnedECTokensCard() {
 
       {listed.length > 0 && (
         <section>
-          <h3 className="mb-3 text-sm font-medium text-gray-700">
+          <h3 className="mb-3 text-sm font-medium text-zinc-700">
             Listed for Sale ({listed.length})
           </h3>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -123,8 +123,8 @@ function TokenCard({ tokenId, isListed }: TokenCardProps) {
 
   if (!tokenInfo) {
     return (
-      <div className="rounded-lg border border-gray-200 p-4">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="rounded-lg border border-zinc-200 p-4">
+        <p className="text-sm text-zinc-500">Loading...</p>
       </div>
     );
   }
@@ -134,32 +134,32 @@ function TokenCard({ tokenId, isListed }: TokenCardProps) {
   const remaining = totalAmount - claimed;
 
   return (
-    <div className="rounded-lg border border-gray-200 p-4 hover:border-gray-300">
+    <div className="rounded-lg border border-zinc-200 p-4 hover:border-zinc-300">
       <div className="mb-3 flex items-center justify-between">
-        <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+        <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-zinc-800">
           TOKEN #{tokenId.toString()}
         </span>
         {isListed && (
-          <span className="text-xs text-green-600">Listed</span>
+          <span className="text-xs text-emerald-600">Listed</span>
         )}
       </div>
 
       <div className="space-y-2">
         <div>
-          <p className="text-xs text-gray-600">Total Value</p>
-          <p className="text-lg font-semibold text-gray-900">
+          <p className="text-xs text-zinc-600">Total Value</p>
+          <p className="text-lg font-semibold text-zinc-900">
             ${totalAmount.toFixed(2)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-600">Remaining</p>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-xs text-zinc-600">Remaining</p>
+          <p className="text-sm font-medium text-zinc-900">
             ${remaining.toFixed(2)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-600">Claimed</p>
-          <p className="text-sm text-gray-600">${claimed.toFixed(2)}</p>
+          <p className="text-xs text-zinc-600">Claimed</p>
+          <p className="text-sm text-zinc-600">${claimed.toFixed(2)}</p>
         </div>
       </div>
     </div>

@@ -4,6 +4,8 @@ import Reveal from 'reveal.js';
 import './reveal-fix.css';
 import 'reveal.js/dist/reveal.css';
 import 'reveal.js/dist/theme/simple.css';
+import chart from './UsuryPayChart.svg';
+import Image from 'next/image';
 
 export default function PresentationPage() {
   const deckDivRef = useRef<HTMLDivElement>(null); // reference to deck container div
@@ -42,9 +44,7 @@ export default function PresentationPage() {
           {/* ── Title ── */}
           <section>
             <h2 className="font-semibold!">Usury Protocol</h2>
-            <p className="text-xl opacity-75">
-              A DeFi Primitive for Expected Cashflows
-            </p>
+            <p className="text-xl opacity-75">Expected Cashflows Tokenized</p>
           </section>
           {/* ── Payroll & Marketplace ── */}
           <section>
@@ -103,7 +103,7 @@ export default function PresentationPage() {
             <h4 className="font-semibold!">
               The primitive consist of two components:
             </h4>
-            <ul className="mt-6 text-left text-xl!">
+            <ul className="mt-6 text-left text-lg!">
               <li className="mt-3">
                 💰 <strong>ECVault</strong> where the payer is <b>expected</b>{' '}
                 to deposit funds in the future; tracks solvency and defaults.
@@ -113,34 +113,35 @@ export default function PresentationPage() {
                 and allowance to claim <b>future cashflows</b> from the vault.
               </li>
             </ul>
-            <p className="mt-8 text-sm opacity-50">
+            <p className="mt-6 text-sm opacity-50">
               <em>
                 Yield is not guaranteed, the primitive carry default risk — and
                 that&apos;s the point.
               </em>
               <br />
+              <span className="text-xs italic">
+                Solvent vaults represnet creditworthyness. 🏦
+              </span>
               <br />
-              Solvent vaults represnet creditworthyness. 🏦
-              <br />
-              Risky EC Tokens can be bought at great discounts. 🤑
+              <span className="text-xs italic">
+                Risky EC Tokens can be bought at great discounts. 🤑
+              </span>
             </p>
+            <Image src={chart} />
           </section>
         </section>
 
         {/* ── Default Risk = Incentive Engine ── */}
         <section>
           <section>
-            <h3 className="font-semibold!">Risk of Default is the Feature</h3>
+            <h3 className="font-semibold!">On-Chain Reputation</h3>
             <p className="mt-4 text-xl!">
               Because default risk exists, both sides are{' '}
-              <strong>
-                incentivized to operate on-chain to minimize trust.
-              </strong>
+              <strong>incentivized to operate on-chain.</strong>
             </p>
             <p className="mt-8 text-sm italic opacity-50">
-              (the economy of the future is on-chain)
+              (On-chain data means minimized trust.)
             </p>
-            <p className="mt-2 text-5xl font-bold opacity-60">👇</p>
           </section>
           <section>
             <p className="mt-4 text-sm italic opacity-50">

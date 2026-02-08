@@ -73,7 +73,7 @@ export default function EmployerPage() {
       <div className="mx-auto w-full max-w-3xl py-8">
         <PageHeader />
         <Card>
-          <p className="text-gray-600">
+          <p className="text-zinc-600">
             Please connect your wallet to continue
           </p>
         </Card>
@@ -86,7 +86,7 @@ export default function EmployerPage() {
       <div className="mx-auto w-full max-w-3xl py-8">
         <PageHeader />
         <Card>
-          <p className="text-gray-600">Loading your vaults...</p>
+          <p className="text-zinc-600">Loading your vaults...</p>
         </Card>
       </div>
     );
@@ -97,14 +97,14 @@ export default function EmployerPage() {
       <div className="mx-auto w-full max-w-3xl py-8">
         <PageHeader />
         <Card>
-          <p className="mb-4 text-gray-600">
+          <p className="mb-4 text-zinc-600">
             You don&apos;t have a payroll vault yet. Create one to start
             managing employee salaries.
           </p>
           <button
             onClick={handleCreateVault}
             disabled={isCreating || isWaitingForTx}
-            className="rounded-md bg-black px-6 py-2 font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="rounded-md bg-black px-6 py-2 font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
           >
             {isCreating || isWaitingForTx
               ? 'Creating Vault...'
@@ -137,8 +137,8 @@ export default function EmployerPage() {
 function PageHeader() {
   return (
     <div className="mb-8">
-      <h1 className="text-3xl font-bold text-gray-900">Employer Dashboard</h1>
-      <p className="mt-2 text-gray-600">
+      <h1 className="text-3xl font-bold text-zinc-900">Employer Dashboard</h1>
+      <p className="mt-2 text-zinc-600">
         Manage EC tokens and vault treasury
       </p>
     </div>
@@ -147,7 +147,7 @@ function PageHeader() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center shadow-sm">
       {children}
     </div>
   );

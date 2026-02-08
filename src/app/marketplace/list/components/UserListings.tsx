@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/app/components/Toast/ToastContext';
 
 import { useMemo, useState } from 'react';
 import { useAccount, useChainId, usePublicClient } from 'wagmi';
@@ -25,6 +26,7 @@ interface UserListingsProps {
 
 export function UserListings({ onCancelled }: UserListingsProps) {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const { showToast } = useToast();
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const publicClient = usePublicClient();
@@ -62,7 +64,7 @@ export function UserListings({ onCancelled }: UserListingsProps) {
     setCancellingId(listingId);
     try {
       if (!publicClient) {
-        alert('Wallet client not ready.');
+        showToast('Wallet client not ready.', 'info');
         return;
       }
       const cancelHash = await cancelListing({
@@ -70,12 +72,12 @@ export function UserListings({ onCancelled }: UserListingsProps) {
       });
       await publicClient.waitForTransactionReceipt({ hash: cancelHash });
 
-      alert('Listing cancelled successfully! Token returned to your wallet.');
+      showToast('Listing cancelled successfully! Token returned to your wallet.', 'info');
       await refetch();
       onCancelled();
     } catch (error) {
       console.error('Failed to cancel listing:', error);
-      alert('Failed to cancel listing. Please try again.');
+      showToast('Failed to cancel listing. Please try again.', 'info');
     } finally {
       setCancellingId(null);
     }
@@ -94,12 +96,12 @@ export function UserListings({ onCancelled }: UserListingsProps) {
 
   if (!isConnected) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your Active Listings
         </h2>
         <div className="py-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-zinc-500">
             Connect your wallet to view your listings.
           </p>
         </div>
@@ -109,12 +111,12 @@ export function UserListings({ onCancelled }: UserListingsProps) {
 
   if (!hasMarketplace) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your Active Listings
         </h2>
         <div className="py-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-zinc-500">
             Marketplace is not deployed on this network.
           </p>
         </div>
@@ -124,13 +126,13 @@ export function UserListings({ onCancelled }: UserListingsProps) {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your Active Listings
         </h2>
         <div className="py-8 text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
-          <p className="text-sm text-gray-500">Loading your listings...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-black"></div>
+          <p className="text-sm text-zinc-500">Loading your listings...</p>
         </div>
       </div>
     );
@@ -138,12 +140,12 @@ export function UserListings({ onCancelled }: UserListingsProps) {
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Your Active Listings
         </h2>
         <div className="py-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-zinc-500">
             Failed to load your listings. Please try again.
           </p>
         </div>
@@ -152,15 +154,15 @@ export function UserListings({ onCancelled }: UserListingsProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-semibold text-zinc-900">
         Your Active Listings
       </h2>
 
       {listings.length === 0 ? (
         <div className="py-8 text-center">
-          <p className="text-gray-600">No active listings</p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="text-zinc-600">No active listings</p>
+          <p className="mt-1 text-sm text-zinc-500">
             List your EC tokens above to get started
           </p>
         </div>
@@ -169,40 +171,40 @@ export function UserListings({ onCancelled }: UserListingsProps) {
           {listings.map((listing) => (
             <div
               key={listing.listingId}
-              className="rounded-md border border-gray-200 p-4"
+              className="rounded-md border border-zinc-200 p-4"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-zinc-900">
                       Token #{listing.tokenId}
                     </p>
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800">
+                    <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-zinc-800">
                       {listing.tokenType}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-zinc-500">
                     {formatAddress(listing.tokenAddress)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-lg font-bold text-zinc-900">
                     ${(listing.price / 1000).toFixed(1)}k
                   </p>
-                  <p className="text-xs text-gray-500">USDC</p>
+                  <p className="text-xs text-zinc-500">USDC</p>
                 </div>
               </div>
 
               <div className="mb-3 flex items-center justify-between text-sm">
                 <div>
-                  <p className="text-gray-600">Listing ID</p>
-                  <p className="font-mono font-medium text-gray-900">
+                  <p className="text-zinc-600">Listing ID</p>
+                  <p className="font-mono font-medium text-zinc-900">
                     #{listing.listingId}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-gray-600">Listed</p>
-                  <p className="font-medium text-gray-900">
+                  <p className="text-zinc-600">Listed</p>
+                  <p className="font-medium text-zinc-900">
                     {getTimeSinceListing(listing.listedAt)}
                   </p>
                 </div>
@@ -211,7 +213,7 @@ export function UserListings({ onCancelled }: UserListingsProps) {
               <button
                 onClick={() => handleCancel(listing.listingId)}
                 disabled={cancellingId === listing.listingId}
-                className="w-full rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+                className="w-full rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
               >
                 {cancellingId === listing.listingId
                   ? 'Cancelling...'
@@ -222,8 +224,8 @@ export function UserListings({ onCancelled }: UserListingsProps) {
         </div>
       )}
 
-      <div className="mt-4 rounded-md bg-gray-50 p-3">
-        <p className="text-xs text-gray-700">
+      <div className="mt-4 rounded-md bg-zinc-50 p-3">
+        <p className="text-xs text-zinc-700">
           <strong>Note:</strong> Cancelling a listing will return the token to
           your wallet. This action cannot be undone.
         </p>

@@ -17,34 +17,34 @@ export function PortfolioSummaryCard() {
 
   if (!address) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Portfolio Summary
         </h2>
-        <p className="text-gray-500">Connect wallet to view portfolio</p>
+        <p className="text-zinc-500">Connect wallet to view portfolio</p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-zinc-900">
           Portfolio Summary
         </h2>
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-zinc-500">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-semibold text-zinc-900">
         Portfolio Summary
       </h2>
       <div>
-        <p className="text-sm text-gray-600">EC Tokens Owned</p>
-        <p className="text-2xl font-bold text-gray-900">{totalTokens}</p>
+        <p className="text-sm text-zinc-600">EC Tokens Owned</p>
+        <p className="text-2xl font-bold text-zinc-900">{totalTokens}</p>
       </div>
     </div>
   );

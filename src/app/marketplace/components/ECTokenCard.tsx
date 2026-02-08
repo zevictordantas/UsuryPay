@@ -15,12 +15,14 @@ import {
   useWriteMarketplaceBuy,
 } from '@/generated';
 import { MarketplaceToken } from './MarketplaceListings';
+import { useToast } from '@/app/components/Toast/ToastContext';
 
 interface ECTokenCardProps {
   token: MarketplaceToken;
 }
 
 export function ECTokenCard({ token }: ECTokenCardProps) {
+  const { showToast } = useToast();
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const { address, isConnected } = useAccount();
@@ -55,15 +57,15 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
     setIsPurchasing(true);
     try {
       if (!isConnected || !address) {
-        alert('Please connect your wallet first.');
+        showToast('Please connect your wallet first.', 'info');
         return;
       }
       if (!marketplace || !usdcAddress) {
-        alert('Marketplace is not available on this network.');
+        showToast('Marketplace is not available on this network.', 'info');
         return;
       }
       if (!publicClient) {
-        alert('Wallet client not ready.');
+        showToast('Wallet client not ready.', 'info');
         return;
       }
 
@@ -71,7 +73,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       const balance = (balanceResult.data ?? BigInt(0)) as bigint;
       if (balance < token.askPriceRaw) {
         const formattedBalance = formatUnits(balance, 6);
-        alert(`Insufficient USDC balance (${formattedBalance}).`);
+        showToast(`Insufficient USDC balance (${formattedBalance}).`, 'info');
         return;
       }
 
@@ -92,11 +94,11 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       });
       await publicClient.waitForTransactionReceipt({ hash: buyHash });
 
-      alert('Purchase successful! Token transferred to your wallet.');
+      showToast('Purchase successful! Token transferred to your wallet.', 'info');
       window.location.reload();
     } catch (error) {
       console.error('Purchase failed:', error);
-      alert('Purchase failed. Please try again.');
+      showToast('Purchase failed. Please try again.', 'info');
     } finally {
       setIsPurchasing(false);
     }
@@ -117,28 +119,28 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
 
   const getTokenTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      payroll: 'bg-blue-100 text-blue-800',
+      payroll: 'bg-emerald-100 text-zinc-800',
       rental: 'bg-purple-100 text-purple-800',
-      subscription: 'bg-green-100 text-green-800',
+      subscription: 'bg-emerald-100 text-emerald-800',
       dividend: 'bg-yellow-100 text-yellow-800',
-      other: 'bg-gray-100 text-gray-800',
-      erc721: 'bg-gray-100 text-gray-800',
-      erc1155: 'bg-gray-100 text-gray-800',
+      other: 'bg-zinc-100 text-zinc-800',
+      erc721: 'bg-zinc-100 text-zinc-800',
+      erc1155: 'bg-zinc-100 text-zinc-800',
     };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    return colors[type] || 'bg-zinc-100 text-zinc-800';
   };
 
   const getRiskColor = (risk: string) => {
     const colors: Record<string, string> = {
-      low: 'text-green-600',
+      low: 'text-emerald-600',
       medium: 'text-yellow-600',
       high: 'text-red-600',
     };
-    return colors[risk] || 'text-gray-600';
+    return colors[risk] || 'text-zinc-600';
   };
 
   const getCreditScoreColor = (score: number) => {
-    if (score >= 750) return 'text-green-600';
+    if (score >= 750) return 'text-emerald-600';
     if (score >= 650) return 'text-yellow-600';
     return 'text-red-600';
   };
@@ -163,7 +165,7 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+    <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex flex-wrap gap-2">
           <span
@@ -185,44 +187,44 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-gray-600">Seller: {token.sellerName}</p>
-        <p className="text-xs text-gray-500">
+        <p className="text-sm text-zinc-600">Seller: {token.sellerName}</p>
+        <p className="text-xs text-zinc-500">
           Vault: {formatAddress(token.vaultAddress)}
         </p>
       </div>
 
       <div className="mb-4">
         <div className="flex items-baseline gap-2">
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-zinc-900">
             ${(token.askPrice / 1000).toFixed(1)}k
           </p>
-          <p className="text-sm text-gray-500 line-through">
+          <p className="text-sm text-zinc-500 line-through">
             ${(token.futureValue / 1000).toFixed(1)}k
           </p>
-          <span className="inline-flex rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">
+          <span className="inline-flex rounded bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
             {token.discountPercent}% off
           </span>
         </div>
-        <p className="mt-1 text-sm font-medium text-green-600">
+        <p className="mt-1 text-sm font-medium text-emerald-600">
           {calculateAPR()}% APR
         </p>
       </div>
 
       <div className="mb-4 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <p className="text-gray-600">Future Value</p>
-          <p className="font-semibold text-gray-900">
+          <p className="text-zinc-600">Future Value</p>
+          <p className="font-semibold text-zinc-900">
             ${token.futureValue.toLocaleString()}
           </p>
         </div>
         <div>
-          <p className="text-gray-600">Duration</p>
-          <p className="font-semibold text-gray-900">
+          <p className="text-zinc-600">Duration</p>
+          <p className="font-semibold text-zinc-900">
             {getTimeRemaining()} days
           </p>
         </div>
         <div>
-          <p className="text-gray-600">Credit Score</p>
+          <p className="text-zinc-600">Credit Score</p>
           <p
             className={`font-semibold ${getCreditScoreColor(token.creditScore)}`}
           >
@@ -230,8 +232,8 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
           </p>
         </div>
         <div>
-          <p className="text-gray-600">Progress</p>
-          <p className="font-semibold text-gray-900">
+          <p className="text-zinc-600">Progress</p>
+          <p className="font-semibold text-zinc-900">
             {Math.round((token.claimed / token.totalAmount) * 100)}%
           </p>
         </div>
@@ -239,41 +241,41 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
 
       <button
         onClick={() => setShowDetails(!showDetails)}
-        className="mb-3 w-full text-center text-sm font-medium text-blue-600 hover:text-blue-800"
+        className="mb-3 w-full text-center text-sm font-medium text-zinc-600 hover:text-zinc-800"
       >
         {showDetails ? 'Hide Details' : 'View Details'}
       </button>
 
       {showDetails && (
-        <div className="mb-4 rounded-md bg-gray-50 p-3 text-xs">
+        <div className="mb-4 rounded-md bg-zinc-50 p-3 text-xs">
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-gray-600">Token ID:</span>
-              <span className="font-mono text-gray-900">
+              <span className="text-zinc-600">Token ID:</span>
+              <span className="font-mono text-zinc-900">
                 {formatAddress(token.tokenId)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Total Amount:</span>
-              <span className="font-medium text-gray-900">
+              <span className="text-zinc-600">Total Amount:</span>
+              <span className="font-medium text-zinc-900">
                 ${token.totalAmount.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Already Claimed:</span>
-              <span className="text-gray-900">
+              <span className="text-zinc-600">Already Claimed:</span>
+              <span className="text-zinc-900">
                 ${token.claimed.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Remaining:</span>
-              <span className="font-medium text-green-600">
+              <span className="text-zinc-600">Remaining:</span>
+              <span className="font-medium text-emerald-600">
                 ${token.futureValue.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Listed:</span>
-              <span className="text-gray-900">
+              <span className="text-zinc-600">Listed:</span>
+              <span className="text-zinc-900">
                 {Math.ceil(
                   (Date.now() - token.listedAt) / (1000 * 60 * 60 * 24)
                 )}{' '}
@@ -282,12 +284,12 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
             </div>
           </div>
 
-          <div className="mt-3 border-t border-gray-200 pt-3">
-            <p className="mb-2 font-medium text-gray-900">
+          <div className="mt-3 border-t border-zinc-200 pt-3">
+            <p className="mb-2 font-medium text-zinc-900">
               Default History
             </p>
             {token.defaultCount === 0 ? (
-              <p className="text-green-600">No defaults recorded</p>
+              <p className="text-emerald-600">No defaults recorded</p>
             ) : (
               <p className="text-red-600">
                 {token.defaultCount} default event
@@ -301,12 +303,12 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       <button
         onClick={handlePurchase}
         disabled={isPurchasing}
-        className="w-full rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+        className="w-full rounded-md bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
       >
         {isPurchasing ? 'Processing...' : 'Buy Token'}
       </button>
 
-      <p className="mt-2 text-center text-xs text-gray-500">
+      <p className="mt-2 text-center text-xs text-zinc-500">
         This is an asset sale, not a loan
       </p>
     </div>

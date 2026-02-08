@@ -126,9 +126,9 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
 
   if (!isConnected) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-gray-500">Connect your wallet to view listings.</p>
+          <p className="text-zinc-500">Connect your wallet to view listings.</p>
         </div>
       </div>
     );
@@ -136,9 +136,9 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
 
   if (!hasMarketplace) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-gray-500">
+          <p className="text-zinc-500">
             Marketplace is not deployed on this network.
           </p>
         </div>
@@ -148,10 +148,10 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
-          <p className="text-gray-500">Loading marketplace listings...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 border-t-black"></div>
+          <p className="text-zinc-500">Loading marketplace listings...</p>
         </div>
       </div>
     );
@@ -159,9 +159,9 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-gray-500">
+          <p className="text-zinc-500">
             Failed to load listings. Please try again.
           </p>
         </div>
@@ -171,10 +171,10 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
 
   if (filteredAndSortedTokens.length === 0) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-lg text-gray-900">No tokens found</p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="text-lg text-zinc-900">No tokens found</p>
+          <p className="mt-2 text-sm text-zinc-500">
             Try adjusting your filters to see more results
           </p>
         </div>
@@ -185,7 +185,7 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-zinc-600">
           Showing {filteredAndSortedTokens.length} token
           {filteredAndSortedTokens.length !== 1 ? 's' : ''}
         </p>

@@ -22,11 +22,11 @@ export default function EmployeePage() {
     return (
       <div className="mx-auto w-full max-w-3xl py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">💳 Employee Dashboard</h1>
-          <p className="mt-2 text-gray-600">Manage your EC tokens and claim salary</p>
+          <h1 className="text-3xl font-bold text-zinc-900">💳 Employee Dashboard</h1>
+          <p className="mt-2 text-zinc-600">Manage your EC tokens and claim salary</p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600">Please connect your wallet to view your salary tokens</p>
+        <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-zinc-600">Please connect your wallet to view your salary tokens</p>
         </div>
       </div>
     );
@@ -35,10 +35,10 @@ export default function EmployeePage() {
   return (
     <div className="mx-auto w-full max-w-3xl py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-zinc-900">
           💳 Employee Dashboard
         </h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-zinc-600">
           Manage your EC tokens and claim salary
         </p>
       </div>

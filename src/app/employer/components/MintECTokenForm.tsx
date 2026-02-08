@@ -1,4 +1,5 @@
 'use client';
+import { useToast } from '@/app/components/Toast/ToastContext';
 
 import { useState } from 'react';
 import { type Address, parseUnits, formatUnits } from 'viem';
@@ -19,6 +20,7 @@ export function MintECTokenForm({
   vaultAddress,
   onSuccess,
 }: MintECTokenFormProps) {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     employeeAddress: '',
     monthlyAmount: '',
@@ -63,14 +65,12 @@ export function MintECTokenForm({
     e.preventDefault();
 
     if (!isValidAddress || monthlyAmount <= 0 || durationMonths <= 0) {
-      alert('Please fill all fields with valid values');
+      showToast('Please fill all fields with valid values', 'info');
       return;
     }
 
     if (!isVaultSolvent) {
-      alert(
-        'Insufficient vault balance. Please fund vault before minting EC tokens.'
-      );
+      showToast('Insufficient vault balance. Please fund vault before minting EC tokens.', 'info');
       return;
     }
 
@@ -93,7 +93,7 @@ export function MintECTokenForm({
         args: [resolvedAddress, monthlyAmountInWei, BigInt(durationMonths)],
       });
 
-      alert('EC Token minted successfully!');
+      showToast('EC Token minted successfully!', 'info');
 
       setFormData({
         employeeAddress: '',
@@ -104,16 +104,16 @@ export function MintECTokenForm({
       onSuccess?.();
     } catch (error) {
       console.error('EC token minting failed:', error);
-      alert('Transaction failed. Check console for details.');
+      showToast('Transaction failed. Check console for details.', 'info');
     }
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-2 text-xl font-semibold text-gray-900">
+    <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-2 text-xl font-semibold text-zinc-900">
         Mint Salary Token for Employee
       </h2>
-      <p className="mb-4 text-sm text-gray-600">
+      <p className="mb-4 text-sm text-zinc-600">
         Create an EC token representing future monthly salary payments
       </p>
 
@@ -128,7 +128,7 @@ export function MintECTokenForm({
         />
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-1 block text-sm font-medium text-zinc-700">
             Monthly Salary (USDC)
           </label>
           <input
@@ -137,14 +137,14 @@ export function MintECTokenForm({
             step="0.01"
             value={formData.monthlyAmount}
             onChange={(e) => handleInputChange('monthlyAmount', e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
             disabled={isPending}
             required
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
+          <label className="mb-1 block text-sm font-medium text-zinc-700">
             Duration (Months)
           </label>
           <input
@@ -156,27 +156,27 @@ export function MintECTokenForm({
             onChange={(e) =>
               handleInputChange('durationMonths', e.target.value)
             }
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
             disabled={isPending}
             required
           />
         </div>
 
         {totalAmount > 0 && (
-          <div className="rounded-md bg-gray-50 p-4">
-            <h3 className="mb-2 text-sm font-medium text-gray-700">
+          <div className="rounded-md bg-zinc-50 p-4">
+            <h3 className="mb-2 text-sm font-medium text-zinc-700">
               Calculated Values
             </h3>
-            <div className="space-y-1 text-sm text-gray-600">
+            <div className="space-y-1 text-sm text-zinc-600">
               <div className="flex justify-between">
                 <span>Total Amount:</span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-zinc-900">
                   {totalAmount.toFixed(2)} USDC
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Duration:</span>
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-zinc-900">
                   {durationMonths} months ({durationMonths * 30} days)
                 </span>
               </div>
@@ -195,7 +195,7 @@ export function MintECTokenForm({
         <button
           type="submit"
           disabled={isPending || !isVaultSolvent || !isValidAddress}
-          className="w-full rounded-md bg-black px-4 py-2 font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+          className="w-full rounded-md bg-black px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
         >
           {isPending ? 'Minting...' : 'Mint Salary Token'}
         </button>

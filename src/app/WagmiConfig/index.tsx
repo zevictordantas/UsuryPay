@@ -1,4 +1,4 @@
-import { createStorage, cookieStorage } from 'wagmi';
+import { createStorage, cookieStorage, http } from 'wagmi';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import {
   anvil,
@@ -19,9 +19,12 @@ export const defaultNetwork = networks[0];
 
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({ storage: cookieStorage }),
-  ssr: true,
+  ssr: true, // AppKit doesn't fully support the ssr flag. (as stated in docs)
   projectId,
   networks,
+  transports: {
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC as string),
+  },
 });
 
 export const config = wagmiAdapter.wagmiConfig;

@@ -38,12 +38,50 @@ export default function PresentationPage() {
   return (
     <div className="reveal transition-all" ref={deckDivRef}>
       <div className="slides">
-        {/* ── Title ── */}
         <section>
-          <h2 className="font-semibold!">Usury Protocol</h2>
-          <p className="text-xl opacity-75">
-            A DeFi Primitive for Expected Cashflows
-          </p>
+          {/* ── Title ── */}
+          <section>
+            <h2 className="font-semibold!">Usury Protocol</h2>
+            <p className="text-xl opacity-75">
+              A DeFi Primitive for Expected Cashflows
+            </p>
+          </section>
+          {/* ── Payroll & Marketplace ── */}
+          <section>
+            <p className="mt-4 text-base opacity-50">Our hackathon demo:</p>
+            <h3 className="font-semibold!">Usury Pay & Usury Market</h3>
+            <p className="mt-4 text-xl">
+              <strong>Usury Pay:</strong>
+              <br />A Payroll dApp that gives <i>you</i> the benefit of usury
+            </p>
+            <p className="mt-2! mb-1! text-base opacity-75">
+              Provide instant liquidity to employees buying their EC Tokens
+              (unlike other platforms)
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Bought EC Tokens accrue value over time making the business
+              profitable
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Selling tokens to investors is also profitable: Keeps the app
+              treasury with liquidity and mitigates risk
+            </p>
+
+            <p className="mt-4 text-xl">
+              <strong>Usury Market:</strong>
+              <br />A Marketplace that makes usury accessible{' '}
+              <i>for everyone</i>
+            </p>
+            <p className="mt-3! mb-1! text-base opacity-75">
+              Market signals how interest-rate should adjust
+            </p>
+            <p className="my-1! text-base opacity-75">
+              Supply and demand discover real risk pricing
+            </p>
+            <p className="my-1! text-base opacity-75">
+              P2P trading offers transparency and better offers
+            </p>
+          </section>
         </section>
 
         {/* ── The Primitive ── */}
@@ -53,12 +91,12 @@ export default function PresentationPage() {
           </h4>
           <ul className="mt-6 text-left text-xl!">
             <li className="mt-3">
-              💰 <strong>ECVault:</strong> Where the <b>payer</b> deposits
-              funds. It tracks defaults & solvency
+              💰 <strong>ECVault</strong> where the payer is <b>expected</b> to
+              deposit funds in the future; tracks solvency and defaults.
             </li>
             <li className="mt-3">
-              💸 <strong>ECToken (ERC-1155):</strong> Represents entitlement to
-              claim future payments from the vault.
+              💸 <strong>ECToken (ERC-1155)</strong> that gives entitlement and
+              allowance to claim future payments from the vault.
             </li>
           </ul>
           <p className="mt-8 text-sm opacity-50">
@@ -216,42 +254,6 @@ export default function PresentationPage() {
               </em>
             </p>
           </section>
-        </section>
-
-        {/* ── Payroll & Marketplace ── */}
-        <section>
-          <p className="mt-4 text-base opacity-50">Our hackathon demo:</p>
-          <h3 className="font-semibold!">Usury Pay & Usury Market</h3>
-          <p className="mt-4 text-xl">
-            <strong>Usury Pay:</strong>
-            <br />A Payroll dApp that gives <i>you</i> the benefit of usury
-          </p>
-          <p className="mt-2! mb-1! text-base opacity-75">
-            Provide instant liquidity to employees buying their EC Tokens
-            (unlike other platforms)
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Bought EC Tokens accrue value over time making the business
-            profitable
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Selling tokens to investors is also profitable: Keeps the app
-            treasury with liquidity and mitigates risk
-          </p>
-
-          <p className="mt-4 text-xl">
-            <strong>Usury Market:</strong>
-            <br />A Marketplace that makes usury accessible <i>for everyone</i>
-          </p>
-          <p className="mt-3! mb-1! text-base opacity-75">
-            Market signals how interest-rate should adjust
-          </p>
-          <p className="my-1! text-base opacity-75">
-            Supply and demand discover real risk pricing
-          </p>
-          <p className="my-1! text-base opacity-75">
-            P2P trading offers transparency and better offers
-          </p>
         </section>
       </div>
     </div>

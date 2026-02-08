@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { type Address, formatUnits } from 'viem';
 import { useChainId } from 'wagmi';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 import {
   useReadPayrollVaultGetMintedTokens,
   useReadMockEcTokenGetTokenInfo,
@@ -15,8 +16,18 @@ interface MintedECTokensListProps {
   onVaultFunded?: () => void;
 }
 
-function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress: Address }) {
-  const { data: tokenInfo, isLoading, error } = useReadMockEcTokenGetTokenInfo({
+function TokenRow({
+  tokenId,
+  ecTokenAddress,
+}: {
+  tokenId: bigint;
+  ecTokenAddress: Address;
+}) {
+  const {
+    data: tokenInfo,
+    isLoading,
+    error,
+  } = useReadMockEcTokenGetTokenInfo({
     args: [tokenId],
     query: { enabled: !!tokenId },
   });
@@ -26,12 +37,19 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
     query: { enabled: !!tokenId },
   });
 
+  // Resolve recipient address to ENS name
+  const { data: recipientEnsName } = useLocalEnsName({
+    address: recipient,
+  });
+
   if (error) {
     console.error('Error loading token info:', error);
     return (
       <tr className="border-b border-gray-100">
         <td className="py-4" colSpan={5}>
-          <div className="text-sm text-red-500">Error loading token #{tokenId.toString()}</div>
+          <div className="text-sm text-red-500">
+            Error loading token #{tokenId.toString()}
+          </div>
         </td>
       </tr>
     );
@@ -41,7 +59,9 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
     return (
       <tr className="border-b border-gray-100">
         <td className="py-4" colSpan={5}>
-          <div className="text-sm text-gray-500">Loading token #{tokenId.toString()}...</div>
+          <div className="text-sm text-gray-500">
+            Loading token #{tokenId.toString()}...
+          </div>
         </td>
       </tr>
     );
@@ -52,8 +72,12 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
   const remaining = totalAmount - claimed;
 
   const now = Math.floor(Date.now() / 1000);
-  const duration = Number(tokenInfo.schedule.endTime) - Number(tokenInfo.schedule.startTime);
-  const elapsed = Math.max(0, Math.min(now - Number(tokenInfo.schedule.startTime), duration));
+  const duration =
+    Number(tokenInfo.schedule.endTime) - Number(tokenInfo.schedule.startTime);
+  const elapsed = Math.max(
+    0,
+    Math.min(now - Number(tokenInfo.schedule.startTime), duration)
+  );
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
 
   return (
@@ -87,14 +111,18 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
         </div>
       </td>
       <td className="py-4">
-        <div className="text-sm text-gray-900">
-          {remaining.toFixed(2)} USDC
-        </div>
+        <div className="text-sm text-gray-900">{remaining.toFixed(2)} USDC</div>
       </td>
       <td className="py-4">
         {recipient ? (
-          <div className="text-xs font-mono text-gray-700" title={recipient}>
-            {recipient.slice(0, 6)}...{recipient.slice(-4)}
+          <div>
+            {recipientEnsName ? (
+              <div className="text-xs text-gray-700">{recipientEnsName}</div>
+            ) : (
+              <div className="font-mono text-xs text-gray-700" title={recipient}>
+                {recipient.slice(0, 6)}...{recipient.slice(-4)}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-xs text-gray-400">Unknown</div>
@@ -150,7 +178,9 @@ export function MintedECTokensList({ vaultAddress }: MintedECTokensListProps) {
           Minted Salary Tokens
         </h2>
         <div className="py-8 text-center">
-          <p className="text-red-500">ECToken address not found for this network</p>
+          <p className="text-red-500">
+            ECToken address not found for this network
+          </p>
         </div>
       </div>
     );

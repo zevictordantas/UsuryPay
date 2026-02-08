@@ -8,6 +8,7 @@
     "wagmi:generate": "wagmi generate",
     "wagmi:watch": "wagmi generate --watch",
     "dev": "next dev",
+    "dev:local": "pnpm deploy:local && pnpm wagmi:generate && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

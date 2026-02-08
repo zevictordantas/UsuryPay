@@ -5,12 +5,18 @@ import { type Address, formatUnits } from 'viem';
 import { useAccount, useChainId, useReadContracts } from 'wagmi';
 import { addresses } from '@/contracts/addresses';
 import { mockEcTokenAbi } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 export function PayrollSummaryCard() {
   const { address: employeeAddress } = useAccount();
   const chainId = useChainId();
   const contractAddresses = addresses[chainId as keyof typeof addresses];
   const ecTokenAddress = contractAddresses?.mockECToken;
+
+  // Resolve employee ENS name
+  const { data: employeeEnsName } = useLocalEnsName({
+    address: employeeAddress,
+  });
 
   const [totalClaimable, setTotalClaimable] = useState(0);
   const [tokenCount, setTokenCount] = useState(0);
@@ -74,6 +80,10 @@ export function PayrollSummaryCard() {
     }
   }, [balanceChecks.data, claimableChecks.data]);
 
+  const headerTitle = employeeEnsName
+    ? `${employeeEnsName}'s Payroll Summary`
+    : 'Payroll Summary';
+
   if (!employeeAddress) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -91,7 +101,7 @@ export function PayrollSummaryCard() {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Payroll Summary
+          {headerTitle}
         </h2>
         <div className="py-8 text-center">
           <p className="text-gray-500">Loading...</p>
@@ -103,7 +113,7 @@ export function PayrollSummaryCard() {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-xl font-semibold text-gray-900">
-        Payroll Summary
+        {headerTitle}
       </h2>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -129,7 +139,7 @@ export function PayrollSummaryCard() {
       </div>
 
       {tokenCount === 0 && (
-        <div className="mt-4 rounded-md bg-blue-50 p-4 text-sm text-blue-700">
+        <div className="mt-4 rounded-md bg-zinc-100/80 p-4 text-sm text-zinc-700">
           <p className="font-medium">How it works:</p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             <li>Your employer mints salary tokens for you</li>

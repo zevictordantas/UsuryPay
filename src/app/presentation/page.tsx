@@ -86,30 +86,45 @@ export default function PresentationPage() {
 
         {/* ── The Primitive ── */}
         <section>
-          <h4 className="font-semibold!">
-            The Primitive consist of two components:
-          </h4>
-          <ul className="mt-6 text-left text-xl!">
-            <li className="mt-3">
-              💰 <strong>ECVault</strong> where the payer is <b>expected</b> to
-              deposit funds in the future; tracks solvency and defaults.
-            </li>
-            <li className="mt-3">
-              💸 <strong>ECToken (ERC-1155)</strong> that gives entitlement and
-              allowance to claim future payments from the vault.
-            </li>
-          </ul>
-          <p className="mt-8 text-sm opacity-50">
-            <em>
-              Yield is not guaranteed, the primitive carry default risk — and
-              that&apos;s the point.
-            </em>
-            <br />
-            <br />
-            Solvent vaults represnet creditworthyness. 🏦
-            <br />
-            Risky EC Tokens can be bought at great discounts. 🤑
-          </p>
+          <section>
+            <p className="mt-4 text-base opacity-50">
+              The core of our project:
+            </p>
+
+            <h4 className="font-semibold!">
+              A Primitive for Expected Cashflows
+            </h4>
+
+            <p className="mt-4 text-base italic opacity-50">
+              A DeFi protocol that enables Usury on-chain
+            </p>
+          </section>
+          <section>
+            <h4 className="font-semibold!">
+              The primitive consist of two components:
+            </h4>
+            <ul className="mt-6 text-left text-xl!">
+              <li className="mt-3">
+                💰 <strong>ECVault</strong> where the payer is <b>expected</b>{' '}
+                to deposit funds in the future; tracks solvency and defaults.
+              </li>
+              <li className="mt-3">
+                💸 <strong>ECToken (ERC-1155)</strong> that gives entitlement
+                and allowance to claim <b>future cashflows</b> from the vault.
+              </li>
+            </ul>
+            <p className="mt-8 text-sm opacity-50">
+              <em>
+                Yield is not guaranteed, the primitive carry default risk — and
+                that&apos;s the point.
+              </em>
+              <br />
+              <br />
+              Solvent vaults represnet creditworthyness. 🏦
+              <br />
+              Risky EC Tokens can be bought at great discounts. 🤑
+            </p>
+          </section>
         </section>
 
         {/* ── Default Risk = Incentive Engine ── */}
@@ -117,7 +132,7 @@ export default function PresentationPage() {
           <section>
             <h3 className="font-semibold!">Risk of Default is the Feature</h3>
             <p className="mt-4 text-xl!">
-              Because default exists, both sides are{' '}
+              Because default risk exists, both sides are{' '}
               <strong>
                 incentivized to operate on-chain to minimize trust.
               </strong>
@@ -128,6 +143,9 @@ export default function PresentationPage() {
             <p className="mt-2 text-5xl font-bold opacity-60">👇</p>
           </section>
           <section>
+            <p className="mt-4 text-sm italic opacity-50">
+              Payers a.k.a: the source of future cashflows
+            </p>
             <h4 className="text-xl font-semibold!">
               Payers want to be trusted
             </h4>
@@ -149,6 +167,10 @@ export default function PresentationPage() {
             </ul>
           </section>
           <section>
+            <p className="mt-4 text-sm italic opacity-50">
+              Investors a.k.a: Usurers, the source of instant liquidity seeking
+              future profit
+            </p>
             <h4 className="text-xl font-semibold!">
               Investors need to assess risk
             </h4>
@@ -181,13 +203,13 @@ export default function PresentationPage() {
                 <span className="italic opacity-50">— on-chain </span>
               </li>
               <li className="mt-2">
-                Funding history{' '}
+                Payment history{' '}
                 <span className="italic opacity-50">— on-chain </span>
               </li>
             </ul>
-            <p className="mt-6 text-sm italic opacity-50">
+            {/* <p className="mt-6 text-sm italic opacity-50">
               Makes them verifiable & composable.
-            </p>
+            </p> */}
           </section>
         </section>
 
@@ -222,6 +244,11 @@ export default function PresentationPage() {
               <li className="mt-3">
                 <strong>Pendle</strong> — Yield trading with <em>guaranteed</em>{' '}
                 returns (aTokens, stETH). No default risk.
+              </li>
+              <li className="mt-3">
+                <strong>Sablier & Superfluid</strong> — Token streaming
+                protocols with real-time payment flows. Require upfront capital
+                locked in streams. No default risk (funds already deposited).
               </li>
               <li className="mt-3">
                 <strong>Aave & Morpho</strong> — Overcollateralized lending

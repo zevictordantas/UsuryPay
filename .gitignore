@@ -41,8 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local anvil deployments (regenerated on local deploy)
-deployments.json
+# Note: deployments.json is tracked with placeholder addresses for builds
+# Local deploys update it but those changes shouldn't be committed
 
 # Foundry
 contracts/cache/

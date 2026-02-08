@@ -28,3 +28,15 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Deployment
+
+| Environment | Chain | Purpose |
+|-------------|-------|---------|
+| Development | Anvil (local) | Local testing |
+| MVP | Sepolia | Testnet validation |
+Lets think about it huh
+
+**Architecture:** ECVault (trustless on-chain) + Arc (cross-chain USDC routing) + Yellow (off-chain micropayments WIP at the moment) .
+
+See [docs/Integrations.md](./docs/Integrations.md) for full integration strategy.

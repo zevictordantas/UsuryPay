@@ -28,7 +28,7 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
   const chainId = useChainId();
   const queryClient = useQueryClient();
   const contractAddresses = addresses[chainId as keyof typeof addresses];
-  const usdcAddress = contractAddresses?.mockUSDC;
+  const usdcAddress = contractAddresses?.usdc;
 
   const { data: balance, queryKey: vaultBalanceQueryKey } =
     useReadPayrollVaultGetBalance({

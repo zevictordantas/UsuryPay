@@ -9,6 +9,7 @@ import {
   useReadMockEcTokenGetTokenRecipient,
 } from '@/generated';
 import { addresses } from '@/contracts/addresses';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface MintedECTokensListProps {
   vaultAddress: Address;
@@ -24,6 +25,11 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
   const { data: recipient } = useReadMockEcTokenGetTokenRecipient({
     args: [tokenId],
     query: { enabled: !!tokenId },
+  });
+
+  // Resolve ENS name for employee address
+  const { data: recipientEnsName } = useLocalEnsName({
+    address: recipient,
   });
 
   if (error) {
@@ -93,8 +99,15 @@ function TokenRow({ tokenId, ecTokenAddress }: { tokenId: bigint; ecTokenAddress
       </td>
       <td className="py-4">
         {recipient ? (
-          <div className="text-xs font-mono text-gray-700" title={recipient}>
-            {recipient.slice(0, 6)}...{recipient.slice(-4)}
+          <div className="space-y-0.5">
+            {recipientEnsName && (
+              <div className="text-xs font-medium text-gray-900">
+                {recipientEnsName}
+              </div>
+            )}
+            <div className="text-xs font-mono text-gray-600" title={recipient}>
+              {recipient.slice(0, 6)}...{recipient.slice(-4)}
+            </div>
           </div>
         ) : (
           <div className="text-xs text-gray-400">Unknown</div>

@@ -14,6 +14,7 @@ import {
 } from '@/generated';
 import { addresses } from '@/contracts/addresses';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface TreasuryCardProps {
   vaultAddress: Address;
@@ -29,6 +30,11 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
   const queryClient = useQueryClient();
   const contractAddresses = addresses[chainId as keyof typeof addresses];
   const usdcAddress = contractAddresses?.mockUSDC;
+
+  // Resolve ENS name for vault address
+  const { data: vaultEnsName } = useLocalEnsName({
+    address: vaultAddress,
+  });
 
   const { data: balance, queryKey: vaultBalanceQueryKey } =
     useReadPayrollVaultGetBalance({
@@ -122,9 +128,21 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
-        ECVault Treasury
-      </h2>
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold text-gray-900">
+          ECVault Treasury
+        </h2>
+        <div className="mt-1 space-y-0.5">
+          {vaultEnsName && (
+            <p className="text-sm font-medium text-gray-700">
+              {vaultEnsName}
+            </p>
+          )}
+          <p className="font-mono text-xs text-gray-500" title={vaultAddress}>
+            {vaultAddress.slice(0, 10)}...{vaultAddress.slice(-8)}
+          </p>
+        </div>
+      </div>
 
       <div className="mb-6 space-y-4">
         {/* Credit Score */}

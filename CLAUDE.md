@@ -33,6 +33,23 @@ pnpm contracts:test   # Run contract tests
 forge fmt             # Format Solidity
 ```
 
+## Local Development Environment
+
+**Network Setup:**
+- Local development uses **Anvil** (chainId 31337)
+- RPC: `http://127.0.0.1:8545`
+- Contracts deployed to Anvil use chainId **31337** in `addresses.ts`
+
+**Environment Detection:**
+- `NEXT_PUBLIC_ENV=dev` or undefined → local development mode
+- `NEXT_PUBLIC_ENV=prod` → production mode
+- On Anvil (chainId 31337), enables contract name mappings (e.g., "usdc.local" → contract address, "anvil1.eth" → test account)
+
+**Why Anvil?**
+- Fast local development
+- Deterministic test accounts
+- Instant transaction confirmations
+
 ## ⚠️ CRITICAL: Contract Address Management
 
 ### Never Hardcode Contract Addresses
@@ -143,7 +160,8 @@ Four distinct user interfaces:
 - Viem for typed contract interactions
 - React Query for blockchain data caching
 - Reown AppKit for wallet modal (project ID in `.env.local`)
-- Currently configured for Arc Testnet
+- **Local dev:** Anvil (chainId 31337)
+- **Production:** Configured for mainnet and Sepolia testnet
 
 ### Wagmi Hook Usage Rule
 

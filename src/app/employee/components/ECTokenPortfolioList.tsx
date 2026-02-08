@@ -8,16 +8,22 @@ import {
   useReadMockEcTokenGetClaimable,
   useReadMockEcTokenBalanceOf,
   useReadPayrollVaultGetEmployerCreditScore,
+  useReadPayrollVaultEmployer,
   useWritePayrollVaultClaim,
   mockEcTokenAbi,
 } from '@/generated';
 import { addresses } from '@/contracts/addresses';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface ECTokenPortfolioListProps {
   onStatusChanged?: () => void;
 }
 
-function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
+function TokenCard({
+  tokenId,
+  ecTokenAddress,
+  onClaimed,
+}: {
   tokenId: bigint;
   ecTokenAddress: Address;
   onClaimed?: () => void;
@@ -42,8 +48,20 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
     address: vaultAddress as Address,
     query: { enabled: !!vaultAddress },
   });
+  const { data: employerAddress } = useReadPayrollVaultEmployer({
+    address: vaultAddress as Address,
+    query: { enabled: !!vaultAddress },
+  });
 
-  const { writeContractAsync: claim, isPending: isClaiming } = useWritePayrollVaultClaim();
+  const { data: vaultName } = useLocalEnsName({
+    address: vaultAddress as Address,
+  });
+  const { data: employerName } = useLocalEnsName({
+    address: employerAddress as Address,
+  });
+
+  const { writeContractAsync: claim, isPending: isClaiming } =
+    useWritePayrollVaultClaim();
 
   if (!tokenInfo || !balance || Number(balance) === 0) {
     return null;
@@ -55,8 +73,12 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
   const remaining = totalAmount - claimed;
 
   const now = Math.floor(Date.now() / 1000);
-  const duration = Number(tokenInfo.schedule.endTime) - Number(tokenInfo.schedule.startTime);
-  const elapsed = Math.max(0, Math.min(now - Number(tokenInfo.schedule.startTime), duration));
+  const duration =
+    Number(tokenInfo.schedule.endTime) - Number(tokenInfo.schedule.startTime);
+  const elapsed = Math.max(
+    0,
+    Math.min(now - Number(tokenInfo.schedule.startTime), duration)
+  );
   const progress = duration > 0 ? (elapsed / duration) * 100 : 0;
 
   const vaultCreditScore = creditScore ? Number(creditScore) : 0;
@@ -98,6 +120,10 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
   const canClaim = claimableAmount > 0;
   const isOwned = Number(balance) > 0;
 
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+
   return (
     <div className="rounded-lg border border-gray-300 bg-gradient-to-br from-white to-gray-50 p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between">
@@ -105,8 +131,31 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
           <p className="font-mono text-sm font-medium text-gray-900">
             {formatTokenId(tokenId)}
           </p>
+          {employerAddress && (
+            <p className="mt-0.5 text-xs text-gray-500">
+              Employer:{' '}
+              {employerName ? (
+                <span>
+                  {employerName} ({formatAddress(employerAddress as string)})
+                </span>
+              ) : (
+                formatAddress(employerAddress as string)
+              )}
+            </p>
+          )}
           <p className="mt-0.5 text-xs text-gray-500">
-            Vault: {vaultAddress ? `${(vaultAddress as string).slice(0, 8)}...` : 'Unknown'}
+            Vault:{' '}
+            {vaultAddress ? (
+              vaultName ? (
+                <span>
+                  {vaultName} ({formatAddress(vaultAddress as string)})
+                </span>
+              ) : (
+                formatAddress(vaultAddress as string)
+              )
+            ) : (
+              'Unknown'
+            )}
           </p>
         </div>
         <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
@@ -158,7 +207,9 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
 
       <div className="mb-3 flex items-center justify-between">
         <span className="text-xs text-gray-600">Vault Credit Score:</span>
-        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getCreditScoreColor(vaultCreditScore)}`}>
+        <span
+          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getCreditScoreColor(vaultCreditScore)}`}
+        >
           {vaultCreditScore} ({getCreditScoreLabel(vaultCreditScore)})
         </span>
       </div>
@@ -170,7 +221,11 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
             disabled={!canClaim || isClaiming}
             className="flex-1 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
           >
-            {isClaiming ? 'Claiming...' : canClaim ? `Claim $${claimableAmount.toFixed(2)}` : 'No Claim Available'}
+            {isClaiming
+              ? 'Claiming...'
+              : canClaim
+                ? `Claim $${claimableAmount.toFixed(2)}`
+                : 'No Claim Available'}
           </button>
         </div>
       )}
@@ -178,7 +233,9 @@ function TokenCard({ tokenId, ecTokenAddress, onClaimed }: {
   );
 }
 
-export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListProps) {
+export function ECTokenPortfolioList({
+  onStatusChanged,
+}: ECTokenPortfolioListProps) {
   const { address: employeeAddress } = useAccount();
   const chainId = useChainId();
   const contractAddresses = addresses[chainId as keyof typeof addresses];
@@ -187,11 +244,14 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
   const [ownedTokenIds, setOwnedTokenIds] = useState<bigint[]>([]);
   const [isScanning, setIsScanning] = useState(true);
 
+  // Get user's ENS name for personalized greeting
+  const { data: userEnsName } = useLocalEnsName({ address: employeeAddress });
+
   // Query balances for token IDs 1-100
   const tokenIdsToCheck = Array.from({ length: 100 }, (_, i) => BigInt(i + 1));
 
   const balanceChecks = useReadContracts({
-    contracts: tokenIdsToCheck.map(tokenId => ({
+    contracts: tokenIdsToCheck.map((tokenId) => ({
       address: ecTokenAddress,
       abi: mockEcTokenAbi,
       functionName: 'balanceOf',
@@ -248,10 +308,12 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          EC Token Portfolio
+          Your payrolls (EC Tokens)
         </h2>
         <div className="py-8 text-center">
-          <p className="text-red-500">ECToken address not found for this network</p>
+          <p className="text-red-500">
+            ECToken address not found for this network
+          </p>
         </div>
       </div>
     );
@@ -261,7 +323,7 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          EC Token Portfolio
+          Your payrolls (EC Tokens)
         </h2>
         <div className="py-8 text-center">
           <p className="text-gray-500">Scanning for your tokens...</p>
@@ -274,12 +336,16 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          EC Token Portfolio
+          Your payrolls (EC Tokens)
         </h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">No EC tokens found</p>
+          <p className="text-gray-500">
+            {userEnsName ? `Sorry ${userEnsName}, it` : 'It'} seems you
+            don&apos;t own any EC tokens yet.
+          </p>
           <p className="mt-2 text-sm text-gray-400">
-            EC tokens are minted when your employer sets up payroll
+            EC tokens are minted when{' '}
+            {userEnsName ? `${userEnsName}'s` : 'your'} employer sets up payroll
           </p>
         </div>
       </div>
@@ -305,7 +371,9 @@ export function ECTokenPortfolioList({ onStatusChanged }: ECTokenPortfolioListPr
 
       <div className="mt-4 border-t border-gray-200 pt-4">
         <p className="text-xs text-gray-500">
-          EC tokens represent your right to claim future salary. You can sell them for immediate cash or hold and claim as they accrue.
+          EC tokens represent {userEnsName ? `${userEnsName}'s` : 'your'} right
+          to claim future salary. {userEnsName ? `${userEnsName}, you` : 'You'}{' '}
+          can sell them for immediate cash or hold and claim as they accrue.
         </p>
       </div>
     </div>

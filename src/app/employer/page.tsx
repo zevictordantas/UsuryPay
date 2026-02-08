@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
+import { useConnection, useWaitForTransactionReceipt } from 'wagmi';
 import { type Address } from 'viem';
 import { TreasuryCard } from './components/TreasuryCard';
 import { MintECTokenForm } from './components/MintECTokenForm';
@@ -11,10 +11,16 @@ import {
   useReadPayrollVaultFactoryGetVaultAddress,
   useWritePayrollVaultFactoryCreateVault,
 } from '@/generated';
+import { useLocalEnsName } from '../hooks/useLocalENS';
 
 export default function EmployerPage() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const { address: employerAddress, isConnected } = useAccount();
+  const { address: employerAddress, isConnected } = useConnection();
+
+  // Get employer's ENS name for personalization
+  const { data: employerEnsName } = useLocalEnsName({
+    address: employerAddress,
+  });
 
   // 1. Fetch employer's vault IDs from factory
   const {
@@ -86,7 +92,11 @@ export default function EmployerPage() {
       <div className="mx-auto w-full max-w-3xl py-8">
         <PageHeader />
         <Card>
-          <p className="text-gray-600">Loading your vaults...</p>
+          <p className="text-gray-600">
+            {employerEnsName
+              ? `Loading ${employerEnsName}'s vaults...`
+              : 'Loading your vaults...'}
+          </p>
         </Card>
       </div>
     );
@@ -98,8 +108,18 @@ export default function EmployerPage() {
         <PageHeader />
         <Card>
           <p className="mb-4 text-gray-600">
-            You don&apos;t have a payroll vault yet. Create one to start
-            managing employee salaries.
+            {employerEnsName ? (
+              <>
+                {employerEnsName}, you don&apos;t have a payroll vault yet.
+                <br />
+                Create one to start managing employee salaries.
+              </>
+            ) : (
+              <>
+                You don&apos;t have a payroll vault yet. Create one to start
+                managing employee salaries.
+              </>
+            )}
           </p>
           <button
             onClick={handleCreateVault}
@@ -138,9 +158,7 @@ function PageHeader() {
   return (
     <div className="mb-8">
       <h1 className="text-3xl font-bold text-gray-900">Employer Dashboard</h1>
-      <p className="mt-2 text-gray-600">
-        Manage EC tokens and vault treasury
-      </p>
+      <p className="mt-2 text-gray-600">Manage EC tokens and vault treasury</p>
     </div>
   );
 }

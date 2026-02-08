@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { type Address, formatUnits } from 'viem';
+import { formatUnits } from 'viem';
 import { useAccount, useChainId, useReadContracts } from 'wagmi';
 import { addresses } from '@/contracts/addresses';
 import { mockEcTokenAbi } from '@/generated';
@@ -129,12 +129,17 @@ export function PayrollSummaryCard() {
       </div>
 
       {tokenCount === 0 && (
-        <div className="mt-4 rounded-md bg-blue-50 p-4 text-sm text-blue-700">
+        <div className="mt-4 rounded-md bg-zinc-200/50 p-4 text-sm text-zinc-700">
           <p className="font-medium">How it works:</p>
           <ul className="mt-2 list-inside list-disc space-y-1">
-            <li>Your employer mints salary tokens for you</li>
-            <li>Tokens accrue value over time (linear vesting)</li>
-            <li>You can claim when ready or sell for immediate cash</li>
+            <li>Employer mints salary tokens for you</li>
+            <li>
+              Tokens accrue value over time (when you are payed you can claim
+              that payment)
+            </li>
+            <li>
+              You can wait for the payments when or sell for immediate cash
+            </li>
           </ul>
         </div>
       )}

@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { ListECTokenForm } from './components/ListECTokenForm';
 import { UserListings } from './components/UserListings';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 export default function ListPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const { address } = useAccount();
+  const { data: userEnsName } = useLocalEnsName({ address });
 
   const handleTokenListed = () => {
     setRefreshKey((prev) => prev + 1);
@@ -28,7 +32,7 @@ export default function ListPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">List EC Token</h1>
         <p className="mt-2 text-gray-600">
-          List your EC tokens for sale on the marketplace
+          {userEnsName ? `List ${userEnsName}'s EC tokens for sale on the marketplace` : 'List your EC tokens for sale on the marketplace'}
         </p>
       </div>
 

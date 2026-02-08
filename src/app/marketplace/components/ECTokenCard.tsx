@@ -15,6 +15,7 @@ import {
   useWriteMarketplaceBuy,
 } from '@/generated';
 import { MarketplaceToken } from './MarketplaceListings';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface ECTokenCardProps {
   token: MarketplaceToken;
@@ -50,6 +51,9 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       enabled: Boolean(usdcAddress && address),
     },
   });
+
+  const { data: sellerEnsName } = useLocalEnsName({ address: token.seller as `0x${string}` });
+  const { data: vaultEnsName } = useLocalEnsName({ address: token.vaultAddress as `0x${string}` });
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
@@ -185,9 +189,11 @@ export function ECTokenCard({ token }: ECTokenCardProps) {
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-gray-600">Seller: {token.sellerName}</p>
+        <p className="text-sm text-gray-600">
+          Seller: {sellerEnsName || formatAddress(token.seller)}
+        </p>
         <p className="text-xs text-gray-500">
-          Vault: {formatAddress(token.vaultAddress)}
+          Vault: {vaultEnsName || formatAddress(token.vaultAddress)}
         </p>
       </div>
 

@@ -2,9 +2,11 @@
 
 import { useAccount } from 'wagmi';
 import { useReadMockEcTokenGetAllTokensOfOwner } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 export function PortfolioSummaryCard() {
   const { address } = useAccount();
+  const { data: userEnsName } = useLocalEnsName({ address });
 
   // Fetch all token IDs owned by user
   const { data: ownedTokenIds, isLoading } =
@@ -40,7 +42,7 @@ export function PortfolioSummaryCard() {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-xl font-semibold text-gray-900">
-        Portfolio Summary
+        {userEnsName ? `${userEnsName}'s Portfolio Summary` : 'Portfolio Summary'}
       </h2>
       <div>
         <p className="text-sm text-gray-600">EC Tokens Owned</p>

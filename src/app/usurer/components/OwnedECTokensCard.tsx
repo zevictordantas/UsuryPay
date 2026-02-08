@@ -1,14 +1,22 @@
 'use client';
 
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 import {
   useReadMockEcTokenGetAllTokensOfOwner,
   useReadMockEcTokenGetTokenInfo,
   useReadMarketplaceGetAllListings,
+  useReadMockEcTokenGetVault,
+  useReadPayrollVaultGetVaultInfo,
 } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
+import { type Address } from 'viem';
 
 export function OwnedECTokensCard() {
   const { address } = useAccount();
+  const chainId = useChainId();
+
+  // Get user's ENS name for personalized greeting
+  const { data: userEnsName } = useLocalEnsName({ address });
 
   // Fetch owned token IDs
   const { data: ownedTokenIds, isLoading } =
@@ -24,9 +32,9 @@ export function OwnedECTokensCard() {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Your EC Tokens
+          EC Tokens
         </h2>
-        <p className="text-gray-500">Connect wallet to view your tokens</p>
+        <p className="text-gray-500">Connect wallet to view tokens</p>
       </div>
     );
   }
@@ -35,9 +43,11 @@ export function OwnedECTokensCard() {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Your EC Tokens
+          {userEnsName ? `${userEnsName}'s EC Tokens` : 'Your EC Tokens'}
         </h2>
-        <p className="text-gray-500">Loading your tokens...</p>
+        <p className="text-gray-500">
+          {userEnsName ? `Loading ${userEnsName}'s tokens...` : 'Loading your tokens...'}
+        </p>
       </div>
     );
   }
@@ -46,10 +56,10 @@ export function OwnedECTokensCard() {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Your EC Tokens
+          {userEnsName ? `${userEnsName}'s EC Tokens` : 'Your EC Tokens'}
         </h2>
         <p className="text-gray-500">
-          You don&apos;t own any EC tokens yet.{' '}
+          {userEnsName ? `${userEnsName} doesn't` : "You don't"} own any EC tokens yet.{' '}
           <a href="/marketplace" className="text-blue-600 hover:underline">
             Browse marketplace
           </a>
@@ -72,7 +82,7 @@ export function OwnedECTokensCard() {
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">
-          Your EC Tokens
+          {userEnsName ? `${userEnsName}'s EC Tokens` : 'Your EC Tokens'}
         </h2>
         <a
           href="/marketplace/list"
@@ -121,6 +131,23 @@ function TokenCard({ tokenId, isListed }: TokenCardProps) {
     args: [tokenId],
   });
 
+  const { data: vaultAddress } = useReadMockEcTokenGetVault({
+    args: [tokenId],
+  });
+
+  const { data: vaultInfo } = useReadPayrollVaultGetVaultInfo({
+    address: vaultAddress,
+    query: { enabled: !!vaultAddress },
+  });
+
+  const { data: vaultName } = useLocalEnsName({
+    address: vaultAddress as Address | undefined,
+  });
+
+  const { data: employerName } = useLocalEnsName({
+    address: vaultInfo?.payer as Address | undefined,
+  });
+
   if (!tokenInfo) {
     return (
       <div className="rounded-lg border border-gray-200 p-4">
@@ -132,6 +159,9 @@ function TokenCard({ tokenId, isListed }: TokenCardProps) {
   const totalAmount = Number(tokenInfo.schedule.totalAmount) / 1e6;
   const claimed = Number(tokenInfo.claimed) / 1e6;
   const remaining = totalAmount - claimed;
+
+  const displayVault = vaultName || (vaultAddress ? `${vaultAddress.slice(0, 6)}...${vaultAddress.slice(-4)}` : '—');
+  const displayEmployer = employerName || (vaultInfo?.payer ? `${vaultInfo.payer.slice(0, 6)}...${vaultInfo.payer.slice(-4)}` : '—');
 
   return (
     <div className="rounded-lg border border-gray-200 p-4 hover:border-gray-300">
@@ -160,6 +190,14 @@ function TokenCard({ tokenId, isListed }: TokenCardProps) {
         <div>
           <p className="text-xs text-gray-600">Claimed</p>
           <p className="text-sm text-gray-600">${claimed.toFixed(2)}</p>
+        </div>
+        <div className="border-t border-gray-100 pt-2">
+          <p className="text-xs text-gray-600">Vault</p>
+          <p className="text-xs font-mono text-gray-900">{displayVault}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-600">Employer</p>
+          <p className="text-xs font-mono text-gray-900">{displayEmployer}</p>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import {
   marketplaceAddress,
   useReadMarketplaceGetAllListings,
 } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 export interface MarketplaceToken {
   listingId: string;
@@ -47,7 +48,7 @@ interface MarketplaceListingsProps {
 
 export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
   const [now, setNow] = useState<number | null>(null);
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const hasMarketplace = Boolean(marketplaceAddress[chainId as keyof typeof marketplaceAddress]);
   const {
@@ -59,6 +60,9 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
       enabled: isConnected && hasMarketplace,
     },
   });
+
+  // Get user's ENS name for personalized greeting
+  const { data: userEnsName } = useLocalEnsName({ address });
 
   useEffect(() => {
     const id = setTimeout(() => setNow(Date.now()), 0);
@@ -79,7 +83,7 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
           tokenAddress: listing.tokenAddress,
           vaultAddress: listing.tokenAddress,
           seller: listing.seller,
-          sellerName: `${listing.seller.slice(0, 6)}...${listing.seller.slice(-4)}`,
+          sellerName: listing.seller,
           tokenType,
           futureValue: askPrice,
           askPrice,
@@ -128,7 +132,7 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-gray-500">Connect your wallet to view listings.</p>
+          <p className="text-gray-500">Connect wallet to view listings.</p>
         </div>
       </div>
     );
@@ -173,7 +177,9 @@ export function MarketplaceListings({ filters }: MarketplaceListingsProps) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
         <div className="py-12 text-center">
-          <p className="text-lg text-gray-900">No tokens found</p>
+          <p className="text-lg text-gray-900">
+            {userEnsName ? `Hi ${userEnsName}, no` : 'No'} tokens found
+          </p>
           <p className="mt-2 text-sm text-gray-500">
             Try adjusting your filters to see more results
           </p>

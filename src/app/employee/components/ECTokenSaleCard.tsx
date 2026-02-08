@@ -13,6 +13,7 @@ import {
   mockEcTokenAbi,
 } from '@/generated';
 import { addresses } from '@/contracts/addresses';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface ECTokenSaleCardProps {
   onSuccess?: () => void;
@@ -30,6 +31,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
 
   const [ownedTokenIds, setOwnedTokenIds] = useState<bigint[]>([]);
   const [isScanning, setIsScanning] = useState(true);
+
+  // Get user's ENS name for personalized messages
+  const { data: userEnsName } = useLocalEnsName({ address: employeeAddress });
 
   // Scan for owned tokens (same logic as portfolio)
   const tokenIdsToCheck = Array.from({ length: 100 }, (_, i) => BigInt(i + 1));
@@ -59,28 +63,36 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
     }
   }, [balanceChecks.data]);
 
-  const selectedTokenIdBigInt = selectedTokenId ? BigInt(selectedTokenId) : undefined;
+  const selectedTokenIdBigInt = selectedTokenId
+    ? BigInt(selectedTokenId)
+    : undefined;
 
   const { data: tokenInfo } = useReadMockEcTokenGetTokenInfo({
-    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    args:
+      selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
     query: { enabled: selectedTokenIdBigInt !== undefined },
   });
   const { data: claimable } = useReadMockEcTokenGetClaimable({
-    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    args:
+      selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
     query: { enabled: selectedTokenIdBigInt !== undefined },
   });
   const { data: ecTokenValue } = useReadPayrollDAppGetEcTokenValue({
-    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    args:
+      selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
     query: { enabled: selectedTokenIdBigInt !== undefined && !!dappAddress },
   });
 
   const { data: balanceCheck } = useReadPayrollDAppCheckBalance({
-    args: selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
+    args:
+      selectedTokenIdBigInt !== undefined ? [selectedTokenIdBigInt] : undefined,
     query: { enabled: selectedTokenIdBigInt !== undefined && !!dappAddress },
   });
 
-  const { writeContractAsync: sellToken, isPending: isSellingToken } = useWritePayrollDAppSellToken();
-  const { writeContractAsync: setApprovalForAll, isPending: isApproving } = useWriteMockEcTokenSetApprovalForAll();
+  const { writeContractAsync: sellToken, isPending: isSellingToken } =
+    useWritePayrollDAppSellToken();
+  const { writeContractAsync: setApprovalForAll, isPending: isApproving } =
+    useWriteMockEcTokenSetApprovalForAll();
 
   const handleApprove = async () => {
     if (!dappAddress || !ecTokenAddress) return;
@@ -91,7 +103,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
         args: [dappAddress, true],
       });
       setIsApproved(true);
-      alert('Approval successful! Now you can sell your token.');
+      alert(
+        `Approval successful! Now ${userEnsName ? userEnsName : 'you'} can sell ${userEnsName ? 'the' : 'your'} token.`
+      );
     } catch (error) {
       console.error('Approval failed:', error);
       alert('Approval failed. Check console for details.');
@@ -107,7 +121,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
         args: [selectedTokenIdBigInt],
       });
 
-      alert('Token sold successfully! USDC has been transferred to your wallet.');
+      alert(
+        `Token sold successfully! USDC has been transferred to ${userEnsName ? `${userEnsName}'s` : 'your'} wallet.`
+      );
       setSelectedTokenId('');
       setIsApproved(false);
       onSuccess?.();
@@ -131,7 +147,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   if (!employeeAddress) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Sell EC Token
+        </h2>
         <div className="py-8 text-center">
           <p className="text-gray-500">Connect wallet to sell your tokens</p>
         </div>
@@ -142,7 +160,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   if (isScanning) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Sell EC Token
+        </h2>
         <div className="py-8 text-center">
           <p className="text-gray-500">Loading your EC tokens...</p>
         </div>
@@ -153,11 +173,17 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   if (ownedTokenIds.length === 0) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          Sell EC Token
+        </h2>
         <div className="py-8 text-center">
-          <p className="text-gray-500">You don't own any EC tokens yet</p>
+          <p className="text-gray-500">
+            Sorry {userEnsName ? `${userEnsName}, you` : 'You'} don't own any EC
+            tokens yet
+          </p>
           <p className="mt-2 text-sm text-gray-400">
-            EC tokens are minted by your employer when they set up payroll
+            EC tokens are minted by {userEnsName ? `${userEnsName}'s` : 'your'}{' '}
+            employer when they set up payroll
           </p>
         </div>
       </div>
@@ -165,23 +191,40 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
   }
 
   const selectedToken = tokenInfo;
-  const totalAmount = selectedToken ? Number(formatUnits(selectedToken.schedule.totalAmount, 6)) : 0;
-  const claimed = selectedToken ? Number(formatUnits(selectedToken.claimed, 6)) : 0;
+  const totalAmount = selectedToken
+    ? Number(formatUnits(selectedToken.schedule.totalAmount, 6))
+    : 0;
+  const claimed = selectedToken
+    ? Number(formatUnits(selectedToken.claimed, 6))
+    : 0;
   const remaining = totalAmount - claimed;
 
-  const [currentValue, futureValue, discountedValue] = ecTokenValue || [BigInt(0), BigInt(0), BigInt(0)];
+  const [currentValue, futureValue, discountedValue] = ecTokenValue || [
+    BigInt(0),
+    BigInt(0),
+    BigInt(0),
+  ];
   const futureValueUSD = Number(formatUnits(futureValue, 6));
   const discountedValueUSD = Number(formatUnits(discountedValue, 6));
-  const discountPercent = futureValueUSD > 0 ? ((futureValueUSD - discountedValueUSD) / futureValueUSD * 100) : 0;
+  const discountPercent =
+    futureValueUSD > 0
+      ? ((futureValueUSD - discountedValueUSD) / futureValueUSD) * 100
+      : 0;
 
-  const [hasBalance, currentBalance, neededAmount] = balanceCheck || [false, BigInt(0), BigInt(0)];
+  const [hasBalance, currentBalance, neededAmount] = balanceCheck || [
+    false,
+    BigInt(0),
+    BigInt(0),
+  ];
   const dappHasBalance = hasBalance as boolean;
 
   const isLoading = isApproving || isSellingToken;
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">Sell EC Token</h2>
+      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+        Sell EC Token
+      </h2>
 
       <div className="space-y-4">
         <div>
@@ -209,11 +252,15 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
         {selectedToken && (
           <>
             <div className="rounded-md bg-gray-50 p-4">
-              <h4 className="text-sm font-medium text-gray-900">Token Details</h4>
+              <h4 className="text-sm font-medium text-gray-900">
+                Token Details
+              </h4>
               <div className="mt-2 space-y-1 text-sm text-gray-700">
                 <div className="flex justify-between">
                   <span>Token ID:</span>
-                  <span className="font-mono">{formatTokenId(selectedTokenId)}</span>
+                  <span className="font-mono">
+                    {formatTokenId(selectedTokenId)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total Amount:</span>
@@ -225,7 +272,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Remaining Value:</span>
-                  <span className="font-medium text-green-600">${remaining.toFixed(2)}</span>
+                  <span className="font-medium text-green-600">
+                    ${remaining.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -237,7 +286,8 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                 </h4>
                 <p className="text-sm text-red-700">
                   The PayrollDApp doesn't have enough USDC to buy this token.
-                  Current balance: ${Number(formatUnits(currentBalance, 6)).toFixed(2)}
+                  Current balance: $
+                  {Number(formatUnits(currentBalance, 6)).toFixed(2)}
                   Needed: ${Number(formatUnits(neededAmount, 6)).toFixed(2)}
                 </p>
                 <p className="mt-2 text-xs text-red-600">
@@ -266,23 +316,40 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                   <div className="mt-3 space-y-1 text-xs text-green-700">
                     <div className="flex justify-between">
                       <span>Future Value:</span>
-                      <span className="font-medium">${futureValueUSD.toFixed(2)}</span>
+                      <span className="font-medium">
+                        ${futureValueUSD.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>You Receive Now:</span>
-                      <span className="font-bold text-green-900">${discountedValueUSD.toFixed(2)}</span>
+                      <span>
+                        {userEnsName
+                          ? `${userEnsName} Receives`
+                          : 'You Receive'}{' '}
+                        Now:
+                      </span>
+                      <span className="font-bold text-green-900">
+                        ${discountedValueUSD.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-md bg-blue-50 p-4">
-                  <h4 className="text-sm font-medium text-blue-900">How It Works</h4>
+                  <h4 className="text-sm font-medium text-blue-900">
+                    How It Works
+                  </h4>
                   <ul className="mt-2 space-y-1 text-sm text-blue-700">
                     <li>• This is an ASSET SALE, not a loan</li>
                     <li>• Single transaction - approve & sell</li>
-                    <li>• USDC transfers to you immediately</li>
+                    <li>
+                      • USDC transfers to {userEnsName ? userEnsName : 'you'}{' '}
+                      immediately
+                    </li>
                     <li>• PayrollDApp assumes all default risk</li>
-                    <li>• You have no future obligation</li>
+                    <li>
+                      • {userEnsName ? `${userEnsName} has` : 'You have'} no
+                      future obligation
+                    </li>
                   </ul>
                 </div>
 
@@ -292,7 +359,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                     disabled={isLoading || !dappHasBalance}
                     className="w-full rounded-md bg-black px-4 py-2 font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
                   >
-                    {isApproving ? 'Approving...' : 'Step 1: Approve PayrollDApp'}
+                    {isApproving
+                      ? 'Approving...'
+                      : 'Step 1: Approve PayrollDApp'}
                   </button>
                 ) : (
                   <button
@@ -300,7 +369,9 @@ export function ECTokenSaleCard({ onSuccess }: ECTokenSaleCardProps) {
                     disabled={isLoading || !dappHasBalance}
                     className="w-full rounded-md bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                   >
-                    {isSellingToken ? 'Selling...' : `Step 2: Sell Token for $${discountedValueUSD.toFixed(2)}`}
+                    {isSellingToken
+                      ? 'Selling...'
+                      : `Step 2: Sell Token for $${discountedValueUSD.toFixed(2)}`}
                   </button>
                 )}
               </>

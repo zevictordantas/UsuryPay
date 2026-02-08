@@ -8,6 +8,7 @@ import {
   useReadPayrollVaultGetBalance,
   useReadPayrollVaultGetRequiredEscrow,
 } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface MintECTokenFormProps {
   vaultAddress: Address;
@@ -34,6 +35,11 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
 
   const vaultBalance = balance ? Number(formatUnits(balance, 6)) : 0;
   const vaultRequiredEscrow = requiredEscrow ? Number(formatUnits(requiredEscrow, 6)) : 0;
+
+  // Resolve ENS name for employee address input
+  const { data: employeeEnsName } = useLocalEnsName({
+    address: isAddress(formData.employeeAddress) ? formData.employeeAddress as Address : undefined,
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -115,6 +121,11 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
             disabled={isPending}
             required
           />
+          {employeeEnsName && isValidAddress && (
+            <p className="mt-1 text-xs text-gray-600">
+              {employeeEnsName}
+            </p>
+          )}
         </div>
 
         <div>

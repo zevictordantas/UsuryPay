@@ -9,6 +9,7 @@ import {
 } from 'wagmi';
 import { erc1155Abi, erc721Abi, isAddress, parseUnits } from 'viem';
 import { marketplaceAddress, useWriteMarketplaceList } from '@/generated';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 
 interface ListECTokenFormProps {
   onSuccess: () => void;
@@ -26,6 +27,7 @@ export function ListECTokenForm({ onSuccess }: ListECTokenFormProps) {
   const { writeContractAsync: writeToken } = useWriteContract();
   const { writeContractAsync: listToken } = useWriteMarketplaceList();
   const marketplace = marketplaceAddress[chainId as keyof typeof marketplaceAddress];
+  const { data: userEnsName } = useLocalEnsName({ address });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +106,7 @@ export function ListECTokenForm({ onSuccess }: ListECTokenFormProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-xl font-semibold text-gray-900">
-        List Your EC Token
+        {userEnsName ? `List ${userEnsName}'s EC Token` : 'List Your EC Token'}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

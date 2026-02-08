@@ -2,8 +2,9 @@
 import { useToast } from '@/app/components/Toast/ToastContext';
 
 import { useState } from 'react';
-import { type Address, parseUnits, formatUnits, isAddress } from 'viem';
+import { type Address, parseUnits, formatUnits } from 'viem';
 import { useChainId } from 'wagmi';
+import { AddressInput } from '@/app/components/AddressInput';
 import {
   useWritePayrollVaultMintSalaryToken,
   useReadPayrollVaultGetBalance,
@@ -15,16 +16,21 @@ interface MintECTokenFormProps {
   onSuccess?: () => void;
 }
 
-export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProps) {
+export function MintECTokenForm({
+  vaultAddress,
+  onSuccess,
+}: MintECTokenFormProps) {
   const { showToast } = useToast();
   const [formData, setFormData] = useState({
     employeeAddress: '',
     monthlyAmount: '',
     durationMonths: '',
   });
+  const [resolvedAddress, setResolvedAddress] = useState<Address | undefined>();
 
   const chainId = useChainId();
-  const { writeContractAsync: mintSalaryToken, isPending } = useWritePayrollVaultMintSalaryToken();
+  const { writeContractAsync: mintSalaryToken, isPending } =
+    useWritePayrollVaultMintSalaryToken();
   const { data: balance } = useReadPayrollVaultGetBalance({
     address: vaultAddress,
     query: { enabled: !!vaultAddress },
@@ -35,10 +41,17 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
   });
 
   const vaultBalance = balance ? Number(formatUnits(balance, 6)) : 0;
-  const vaultRequiredEscrow = requiredEscrow ? Number(formatUnits(requiredEscrow, 6)) : 0;
+  const vaultRequiredEscrow = requiredEscrow
+    ? Number(formatUnits(requiredEscrow, 6))
+    : 0;
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddressChange = (value: string, resolved?: Address) => {
+    setFormData((prev) => ({ ...prev, employeeAddress: value }));
+    setResolvedAddress(resolved);
   };
 
   const monthlyAmount = parseFloat(formData.monthlyAmount) || 0;
@@ -46,7 +59,7 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
   const totalAmount = monthlyAmount * durationMonths;
 
   const isVaultSolvent = vaultBalance >= vaultRequiredEscrow + totalAmount;
-  const isValidAddress = formData.employeeAddress && isAddress(formData.employeeAddress);
+  const isValidAddress = !!resolvedAddress;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,13 +83,14 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
         duration: durationMonths,
       });
 
+      if (!resolvedAddress) {
+        alert('Could not resolve employee address');
+        return;
+      }
+
       await mintSalaryToken({
         address: vaultAddress,
-        args: [
-          formData.employeeAddress as Address,
-          monthlyAmountInWei,
-          BigInt(durationMonths),
-        ],
+        args: [resolvedAddress, monthlyAmountInWei, BigInt(durationMonths)],
       });
 
       showToast('EC Token minted successfully!', 'info');
@@ -104,20 +118,14 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700">
-            Employee Wallet Address
-          </label>
-          <input
-            type="text"
-            placeholder="0x..."
-            value={formData.employeeAddress}
-            onChange={(e) => handleInputChange('employeeAddress', e.target.value)}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-            disabled={isPending}
-            required
-          />
-        </div>
+        <AddressInput
+          label="Employee Wallet Address or ENS"
+          value={formData.employeeAddress}
+          onChange={handleAddressChange}
+          placeholder="0x... or employee.usury.eth"
+          disabled={isPending}
+          required
+        />
 
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700">
@@ -145,7 +153,9 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
             min="1"
             step="1"
             value={formData.durationMonths}
-            onChange={(e) => handleInputChange('durationMonths', e.target.value)}
+            onChange={(e) =>
+              handleInputChange('durationMonths', e.target.value)
+            }
             className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-500 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
             disabled={isPending}
             required
@@ -154,7 +164,9 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
 
         {totalAmount > 0 && (
           <div className="rounded-md bg-zinc-50 p-4">
-            <h3 className="mb-2 text-sm font-medium text-zinc-700">Calculated Values</h3>
+            <h3 className="mb-2 text-sm font-medium text-zinc-700">
+              Calculated Values
+            </h3>
             <div className="space-y-1 text-sm text-zinc-600">
               <div className="flex justify-between">
                 <span>Total Amount:</span>
@@ -174,7 +186,9 @@ export function MintECTokenForm({ vaultAddress, onSuccess }: MintECTokenFormProp
 
         {!isVaultSolvent && totalAmount > 0 && (
           <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">
-            ⚠ Vault balance insufficient. Need {(totalAmount - (vaultBalance - vaultRequiredEscrow)).toFixed(2)} USDC more.
+            ⚠ Vault balance insufficient. Need{' '}
+            {(totalAmount - (vaultBalance - vaultRequiredEscrow)).toFixed(2)}{' '}
+            USDC more.
           </div>
         )}
 

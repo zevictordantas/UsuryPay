@@ -34,7 +34,7 @@ export default function RootLayout({
           <Header />
           <main className="flex flex-1 bg-zinc-100">{children}</main>
           <div className="w-full shrink-0 bg-black py-2 text-center text-white">
-            Footer (ToDo)
+            Made by Ze and Jara - Hack Money 2026 - ETHGlobal
           </div>
         </body>
       </ServerProviders>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { type Address, parseUnits, formatUnits, erc20Abi } from 'viem';
 
 import { useChainId, useConnection, useReadContract, usePublicClient } from 'wagmi';
+import { useLocalEnsName } from '@/app/hooks/useLocalENS';
 import {
   useReadPayrollVaultGetBalance,
   useReadPayrollVaultGetRequiredEscrow,
@@ -41,6 +42,11 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
     query: {
       enabled: !!usdcAddress && !!employerAddress,
     },
+  });
+
+  // Resolve employer ENS name
+  const { data: employerEnsName } = useLocalEnsName({
+    address: employerAddress,
   });
 
   const { data: balance, queryKey: vaultBalanceQueryKey } =
@@ -148,7 +154,7 @@ export function TreasuryCard({ vaultAddress }: TreasuryCardProps) {
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-xl font-semibold text-zinc-900">
-        ECVault Treasury
+        {employerEnsName ? `${employerEnsName}'s Treasury` : 'ECVault Treasury'}
       </h2>
 
       <div className="mb-6 space-y-4">
